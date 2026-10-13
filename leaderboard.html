@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>لوحة المتصدرين والجوائز</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Cairo',sans-serif;background-color:#0b0f19;color:white;margin:0;padding:0}
+.glass-panel{background:rgba(20,27,45,0.75);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08)}
+</style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 flex flex-col items-center">
+    <div class="w-full max-w-4xl space-y-6">
+        <header class="glass-panel p-6 rounded-2xl border border-slate-700 flex flex-wrap justify-between items-center gap-4">
+            <div>
+                <h1 class="text-3xl font-black text-yellow-400 flex items-center gap-2">
+                    <i class="fas fa-trophy"></i> لوحة الشرف والمتصدرين
+                </h1>
+                <p class="text-gray-400 text-sm mt-1">المقهى: <span id="cafeTitle" class="text-white font-bold text-base">جارٍ التحميل…</span></p>
+            </div>
+            <div id="prizeBox" class="bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-yellow-500/30 px-4 py-2 rounded-xl text-center">
+                <span class="text-xs text-yellow-300 font-bold block">🎁 جائزة المنافسة الحالية:</span>
+                <span id="prizeName" class="text-sm font-black text-white">قهوة مجانية للفائز</span>
+            </div>
+        </header>
+
+        <!-- قائمة الترتيب -->
+        <div class="glass-panel p-6 rounded-2xl border border-slate-700">
+            <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-cyan-300">
+                <i class="fas fa-medal"></i> أفضل النتائج والفرق
+            </h2>
+            <div id="leadersList" class="space-y-2">
+                <p class="text-gray-500 text-center py-6">جارٍ تحميل قائمة المتصدرين…</p>
+            </div>
+        </div>
+
+        <div class="flex gap-2 justify-center pt-2">
+            <a href="/games.html" class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black px-6 py-2.5 rounded-xl shadow-lg transition">
+                <i class="fas fa-th-large"></i> بوابة جميع الألعاب
+            </a>
+            <a href="/player.html" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-2.5 rounded-xl shadow-lg transition">
+                <i class="fas fa-gamepad"></i> العبها صح
+            </a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, ref, get, onValue } from './firebase-init.js';
+
+        const P = new URLSearchParams(location.search);
+        const cafeId = P.get('cafe') || 'cafe-demo';
+
+        const escapeHtml = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+        // اسم الكافيه والجائزة
+        get(ref(db, 'cafePublic/' + cafeId)).then(s => {
+            if (s.exists()) {
+                const d = s.val() || {};
+                document.getElementById('cafeTitle').textContent = d.name || 'الكافيه';
+                if (d.prize && d.prize.active) {
+                    document.getElementById('prizeName').textContent = d.prize.title || 'جائزة خاصة';
+                }
+            } else {
+                document.getElementById('cafeTitle').textContent = 'كافيه الأصدقاء';
+            }
+        });
+
+        // قائمة المتصدرين الحية
+        onValue(ref(db, 'leaderboard/' + cafeId), (s) => {
+            const list = [];
+            if (s.exists()) {
+                s.forEach(c => list.push(c.val()));
+            }
+            list.sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            const container = document.getElementById('leadersList');
+            if (!list.length) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-6">لا توجد نتائج مسجلة بعد. العبوا وسجلوا أسماءكم في لوحة الشرف!</p>';
+                return;
+            }
+
+            container.innerHTML = list.slice(0, 30).map((r, i) => {
+                const medal = i === 0 ? '🥇' : (i === 1 ? '🥈' : (i === 2 ? '🥉' : `${i + 1}`));
+                const col = i === 0 ? 'border-yellow-500/50 bg-yellow-500/10' : (i === 1 ? 'border-slate-400/40 bg-slate-500/10' : (i === 2 ? 'border-amber-700/40 bg-amber-700/10' : 'border-slate-700/50 bg-slate-800/40'));
+                return `<div class="flex justify-between items-center p-3 rounded-xl border ${col}">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl font-black w-8 text-center">${medal}</span>
+                        <div>
+                            <span class="font-bold text-white text-base">${escapeHtml(r.name)}</span>
+                            <span class="text-xs text-gray-400 block">${escapeHtml(r.game || 'العبها صح')} • ${new Date(r.ts || Date.now()).toLocaleDateString('ar-JO')}</span>
+                        </div>
+                    </div>
+                    <span class="text-xl font-black text-emerald-400 font-mono">${r.score || 0} <span class="text-xs text-gray-400 font-normal">نقطة</span></span>
+                </div>`;
+            }).join('');
+        });
+    </script>
+</body>
+</html>

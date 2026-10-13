@@ -1,0 +1,14 @@
+/admin            /index.html          200
+/admin.html       /index.html          200
+/games            /games.html          200
+/play             /games.html          200
+/player           /player.html         200
+/board            /player.html         200
+/mafia            /mafia.html          200
+/race             /race.html           200
+/htns             /htns.html           200
+/leaderboard      /leaderboard.html    200
+/download         /cafe-games-project.zip 200
+/download-project /cafe-games-project.zip 200
+/api/download     /cafe-games-project.zip 200
+/api/*            /.netlify/functions/api/:splat 200
