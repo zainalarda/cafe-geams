@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>العبها صح - منصة ألعاب المقاهي</title>
+    <meta name="description" content="منصة ترفيهية شاملة لإدارة ألعاب المقاهي، لعبة المافيا متعددة اللاعبين، وتحدي الطاولات التفاعلية" />
+    <meta property="og:title" content="العبها صح - منصة ألعاب المقاهي" />
+    <meta property="og:description" content="منصة ترفيهية شاملة لإدارة ألعاب المقاهي، لعبة المافيا متعددة اللاعبين، وتحدي الطاولات التفاعلية" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif; background-color: #0b0f19; color: white; margin: 0; padding: 0; }
+        .glass-panel { background: rgba(20, 27, 45, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); }
+        .hidden { display: none !important; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-3 sm:p-5">
+
+    <!-- شريط تنبيه النظام الهجين -->
+    <div id="configBanner" class="hidden fixed top-0 left-0 right-0 bg-emerald-600/90 text-white text-center py-2 px-4 text-xs sm:text-sm font-bold z-50 shadow-md">
+        ✓ النظام يعمل الآن بنجاح في الوضع الهجين (محلياً وسحابياً).
+    </div>
+
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginView" class="glass-panel p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md transition-all">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-gradient-to-tr from-emerald-500 to-teal-400 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/20 mb-3">
+                <i class="fas fa-gamepad text-slate-900"></i>
+            </div>
+            <h1 class="text-3xl font-extrabold text-emerald-400 mb-1">العبها صح</h1>
+            <p class="text-gray-400 text-sm">بوابة الدخول الآمنة للمقاهي وإدارة الألعاب</p>
+            
+        </div>
+
+        <!-- بطاقة الانتقال السريع لبوابة ألعاب الزبائن -->
+        <div class="glass-panel p-3.5 mb-5 rounded-2xl border-2 border-amber-500/40 bg-gradient-to-r from-amber-500/15 to-yellow-500/10 flex items-center justify-between gap-3 shadow-lg">
+            <div class="flex items-center gap-2.5">
+                <span class="text-2xl">☕</span>
+                <div>
+                    <b class="text-amber-300 text-xs block font-black">هل أنت زبون على الطاولة؟</b>
+                    <span class="text-[11px] text-gray-300">ادخل بكلمة سر الطاولة وتنافس في الألعاب</span>
+                </div>
+            </div>
+            <a href="/games.html" class="bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black px-3.5 py-2 rounded-xl text-xs shadow-md transition whitespace-nowrap flex items-center gap-1">
+                <span>🎮 بوابة الألعاب</span> <i class="fas fa-arrow-left text-[10px]"></i>
+            </a>
+        </div>
+
+        <!-- نموذج تسجيل الدخول -->
+        <form id="loginForm" class="space-y-4">
+            <div>
+                <label class="block text-sm text-gray-300 mb-1 font-bold">البريد الإلكتروني</label>
+                <input type="email" id="loginUser" autocomplete="username"  class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-medium" required>
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-1 font-bold">كلمة المرور</label>
+                <input type="password" id="loginPass" autocomplete="current-password"  class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-medium" required>
+            </div>
+            <div id="loginError" class="text-red-400 text-sm hidden text-center bg-red-900/30 py-2 rounded font-bold"></div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 transition py-3 rounded-lg font-bold text-base shadow-lg shadow-emerald-600/30">تسجيل الدخول</button>
+            <div class="flex flex-wrap justify-between items-center text-xs text-gray-400 pt-2 gap-2">
+                <span>ليس لديك حساب؟ <button type="button" id="toSignupBtn" class="text-emerald-400 font-bold hover:underline">إنشاء حساب كافيه</button></span>
+                <div class="flex items-center gap-3">
+                    <a href="/games.html" class="text-amber-400 hover:underline font-bold">بوابة ألعاب الزبائن 🎮 ←</a>
+                </div>
+            </div>
+        </form>
+
+        <!-- نموذج إنشاء حساب جديد -->
+        <form id="signupForm" class="space-y-4 hidden">
+            <div>
+                <label class="block text-sm text-gray-300 mb-1 font-bold">اسم المقهى</label>
+                <input type="text" id="signupCafeName" placeholder="مثال: كافيه النجوم" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500" required>
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-1 font-bold">المدينة</label>
+                <input type="text" id="signupCity" placeholder="عمان، إربد، الرياض..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500">
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-1 font-bold">رقم الهاتف (للتواصل)</label>
+                <input type="tel" id="signupPhone" dir="ltr" placeholder="07XXXXXXXX" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500" required>
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-1 font-bold">البريد الإلكتروني</label>
+                <input type="email" id="signupEmail" autocomplete="username" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500" required>
+            </div>
+            <div>
+                <label class="block text-sm text-gray-300 mb-1 font-bold">كلمة المرور (6 أحرف على الأقل)</label>
+                <input type="password" id="signupPass" autocomplete="new-password" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-emerald-500" required minlength="6">
+            </div>
+            <div id="signupError" class="text-red-400 text-sm hidden text-center bg-red-900/30 py-2 rounded"></div>
+            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 transition py-2.5 rounded-lg font-bold text-base shadow-lg">إنشاء الحساب</button>
+            <p class="text-center text-sm text-gray-400 pt-1">لديك حساب بالفعل؟
+                <button type="button" id="toLoginBtn" class="text-emerald-400 font-bold hover:underline">تسجيل الدخول</button>
+            </p>
+        </form>
+    </div>
+
+    <!-- شاشة انتظار الموافقة -->
+    <div id="waitingView" class="hidden glass-panel p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+        <div class="text-6xl mb-4">⏳</div>
+        <h2 class="text-2xl font-bold text-yellow-400 mb-3">حسابك قيد المراجعة</h2>
+        <p class="text-gray-300 text-sm leading-relaxed">تم إنشاء حساب المقهى بنجاح. بانتظار موافقة إدارة المنصة لتفعيله. ستتمكن من فتح الطاولات وإدارتها فور الموافقة.</p>
+        <button id="waitingLogoutBtn" class="mt-6 bg-slate-700 hover:bg-slate-600 px-6 py-2.5 rounded-lg transition font-bold text-sm">تسجيل الخروج</button>
+    </div>
+
+    <!-- شاشة الحساب المرفوض / المحظور -->
+    <div id="blockedView" class="hidden glass-panel p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+        <div class="text-6xl mb-4">⛔</div>
+        <h2 class="text-2xl font-bold text-red-400 mb-3">الحساب غير مفعّل</h2>
+        <p id="blockedMsg" class="text-gray-300 text-sm leading-relaxed">تم رفض هذا الحساب أو إغلاقه من قبل إدارة المنصة.</p>
+        <button id="blockedLogoutBtn" class="mt-6 bg-slate-700 hover:bg-slate-600 px-6 py-2.5 rounded-lg transition font-bold text-sm">تسجيل الخروج</button>
+    </div>
+
+    <!-- لوحة الإدارة العليا (Super Admin View) -->
+    <div id="superAdminView" class="hidden w-full max-w-6xl">
+        <header class="flex flex-wrap justify-between items-center gap-4 mb-5 bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl">
+            <div>
+                <h1 class="text-2xl font-black text-purple-400 flex items-center gap-2">
+                    <i class="fas fa-user-shield"></i> لوحة إدارة المنصة العليا
+                </h1>
+                <p class="text-gray-400 text-sm mt-0.5">مراجعة المقاهي والاشتراكات، إدارة الأسئلة، والتحكم بالنظام</p>
+                <p id="adminConnStatus" class="text-xs mt-1 font-bold text-emerald-400">✓ الخادم متصل بنجاح</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/games.html" target="_blank" class="bg-amber-600/20 text-amber-300 border border-amber-500/30 hover:bg-amber-600 hover:text-slate-950 px-3.5 py-2 rounded-lg text-sm font-bold transition flex items-center gap-1.5">
+                    <i class="fas fa-gamepad"></i> بوابة الألعاب
+                </a>
+                <button id="adminLogoutBtn" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition flex items-center gap-1.5">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
+            </div>
+        </header>
+
+        <!-- شريط الإحصائيات المباشر -->
+        <div id="statsStrip" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
+            <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-black text-purple-400" id="stCafesTotal">0</div><div class="text-xs text-gray-400 mt-0.5">إجمالي المقاهي</div></div>
+            <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-black text-emerald-400" id="stCafesActive">0</div><div class="text-xs text-gray-400 mt-0.5">مقاهي نشطة</div></div>
+            <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-black text-yellow-400" id="stCafesPending">0</div><div class="text-xs text-gray-400 mt-0.5">قيد المراجعة</div></div>
+            <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-black text-blue-400" id="stTablesActive">0</div><div class="text-xs text-gray-400 mt-0.5">طاولات نشطة</div></div>
+            <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-black text-cyan-400" id="stCats">0</div><div class="text-xs text-gray-400 mt-0.5">الفئات</div></div>
+            <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-black text-pink-400" id="stQuestions">0</div><div class="text-xs text-gray-400 mt-0.5">الأسئلة</div></div>
+        </div>
+
+        <!-- التبويبات -->
+        <div class="flex gap-2 mb-5 flex-wrap">
+            <button id="tabCafes" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-purple-600 text-white transition"><i class="fas fa-store ml-1.5"></i>المقاهي</button>
+            <button id="tabTables" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-slate-700 text-gray-300 hover:bg-slate-600 transition"><i class="fas fa-table ml-1.5"></i>كل الطاولات</button>
+            <button id="tabQuestions" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-slate-700 text-gray-300 hover:bg-slate-600 transition"><i class="fas fa-question-circle ml-1.5"></i>الأسئلة والفئات</button>
+            <button id="tabSettings" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-slate-700 text-gray-300 hover:bg-slate-600 transition"><i class="fas fa-sliders-h ml-1.5"></i>التحكم والسجل</button>
+            <button id="tabGames" class="tab-btn px-4 py-2 rounded-lg font-bold text-sm bg-slate-700 text-gray-300 hover:bg-slate-600 transition"><i class="fas fa-trophy ml-1.5"></i>المباريات</button>
+        </div>
+
+        <!-- لوحة المقاهي -->
+        <div id="cafesPanel">
+            <div class="flex flex-wrap justify-between items-center gap-3 mb-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700">
+                <h2 class="text-lg font-bold">المقاهي المسجّلة</h2>
+                <span id="cafeCount" class="text-gray-400 text-sm"></span>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <input id="cafeSearch" type="search" placeholder="بحث بالاسم أو المدينة أو البريد…" class="flex-1 min-w-[200px] bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                <select id="cafeFilter" class="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <option value="all">كل الحالات</option>
+                    <option value="active">نشط</option>
+                    <option value="pending">قيد المراجعة</option>
+                    <option value="rejected">مرفوض</option>
+                    <option value="blocked">محظور</option>
+                </select>
+                <button id="approveAllBtn" class="bg-emerald-600 hover:bg-emerald-500 px-3.5 py-2 rounded-lg text-sm font-bold"><i class="fas fa-check-double ml-1"></i>قبول المعلّقين</button>
+                <button id="exportCafesBtn" class="bg-slate-700 hover:bg-slate-600 px-3.5 py-2 rounded-lg text-sm font-bold"><i class="fas fa-file-csv ml-1"></i>تصدير CSV</button>
+                <button id="addCafeBtn" class="bg-purple-600 hover:bg-purple-500 px-3.5 py-2 rounded-lg text-sm font-bold"><i class="fas fa-plus ml-1"></i>إضافة مقهى</button>
+            </div>
+            <div id="cafesContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+            <div id="noCafesMsg" class="glass-panel p-8 rounded-2xl text-center border-dashed border-2 border-slate-600 mt-4 hidden">
+                <h2 class="text-xl text-gray-300 mb-1">لا توجد مقاهي مطابقة</h2>
+                <p class="text-gray-500 text-sm">ستظهر هنا طلبات المقاهي الجديدة فور تسجيلها.</p>
+            </div>
+        </div>
+
+        <!-- لوحة كل الطاولات -->
+        <div id="tablesPanel" class="hidden">
+            <div class="flex justify-between items-center mb-4 bg-slate-800/60 p-4 rounded-xl border border-slate-700">
+                <h2 class="text-lg font-bold">كل الطاولات عبر المقاهي</h2>
+                <span id="adminTableCount" class="text-gray-400 text-sm"></span>
+            </div>
+            <div class="flex flex-wrap gap-2 mb-4">
+                <input id="tableSearch" type="search" placeholder="بحث بالكود أو اسم المقهى…" class="flex-1 min-w-[200px] bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                <select id="tableFilter" class="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <option value="all">كل الطاولات</option>
+                    <option value="playing">قيد اللعب</option>
+                    <option value="idle">بانتظار لاعبين</option>
+                </select>
+                <button id="closeAllTablesBtn" class="bg-red-600/80 hover:bg-red-500 px-3.5 py-2 rounded-lg text-sm font-bold"><i class="fas fa-power-off ml-1"></i>إغلاق كل الطاولات</button>
+            </div>
+            <div id="adminTablesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="noAdminTablesMsg" class="glass-panel p-8 rounded-2xl text-center border-dashed border-2 border-slate-600 mt-4 hidden">
+                <h2 class="text-xl text-gray-300 mb-1">لا توجد طاولات حالياً</h2>
+                <p class="text-gray-500 text-sm">ستظهر هنا كل الطاولات المفتوحة في جميع المقاهي فور إنشائها.</p>
+            </div>
+        </div>
+
+        <!-- لوحة المباريات -->
+        <div id="gamesPanel" class="hidden space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-bold text-emerald-400" id="gmTotal">0</div><div class="text-xs text-gray-400 mt-1">مباريات مسجّلة</div></div>
+                <div class="glass-panel rounded-xl p-3 text-center"><div class="text-2xl font-bold text-yellow-400" id="gmToday">0</div><div class="text-xs text-gray-400 mt-1">مباريات اليوم</div></div>
+                <div class="glass-panel rounded-xl p-3 text-center"><div class="text-base font-bold text-pink-400 truncate" id="gmTop">—</div><div class="text-xs text-gray-400 mt-1">أكثر مقهى نشاطاً</div></div>
+            </div>
+            <div class="flex justify-between items-center"><h2 class="text-lg font-bold">سجل آخر المباريات</h2><button id="exportGamesBtn" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-file-csv ml-1"></i>تصدير CSV</button></div>
+            <div id="gamesList" class="space-y-2"></div>
+        </div>
+
+        <!-- لوحة التحكم والسجل -->
+        <div id="settingsPanel" class="hidden space-y-4">
+            <div class="glass-panel p-5 rounded-2xl border border-slate-700 space-y-4">
+                <h2 class="text-lg font-bold"><i class="fas fa-sliders-h ml-1 text-purple-400"></i>إعدادات المنصة</h2>
+                <div class="flex flex-wrap gap-2 items-center bg-slate-800/50 rounded-xl p-3">
+                    <button id="backupBtn" class="bg-slate-700 hover:bg-slate-600 px-3.5 py-2 rounded-lg text-xs font-bold"><i class="fas fa-database ml-1"></i>نسخة احتياطية JSON</button>
+                    <button id="purgeRejectedBtn" class="bg-red-600/80 hover:bg-red-500 px-3.5 py-2 rounded-lg text-xs font-bold"><i class="fas fa-user-slash ml-1"></i>حذف المرفوضين</button>
+                    <span class="text-xs text-gray-300 flex items-center gap-1.5">تنظيف الطاولات الأقدم من <input id="cleanHours" type="number" min="1" value="6" class="w-14 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-white"> ساعة <button id="cleanIdleBtn" class="bg-yellow-600 hover:bg-yellow-500 px-3 py-1 rounded text-xs font-bold">تنظيف</button></span>
+                </div>
+                <label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" id="setMaint" class="w-5 h-5 rounded"><span class="font-bold text-sm">وضع الصيانة (يمنع اللاعبين من الانضمام للطاولات)</span></label>
+                <input id="setMaintMsg" type="text" placeholder="رسالة الصيانة التي تظهر للاعبين" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                <input id="setAnn" type="text" placeholder="إعلان عام يظهر في لوحات أصحاب المقاهي" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div><label class="block text-xs text-gray-400 mb-1">الحد الافتراضي للطاولات</label><input id="setMax" type="number" min="0" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white"></div>
+                    <div><label class="block text-xs text-gray-400 mb-1">فئات كل فريق (1-5)</label><input id="setPicks" type="number" min="1" max="5" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white"></div>
+                    <div><label class="block text-xs text-gray-400 mb-1">مؤقت السؤال (ثانية)</label><input id="setTimer" type="number" min="0" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white"></div>
+                </div>
+                <button id="saveSettingsBtn" class="bg-purple-600 hover:bg-purple-500 px-5 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-save ml-1"></i>حفظ الإعدادات</button>
+            </div>
+            <div class="glass-panel p-5 rounded-2xl border border-slate-700">
+                <h2 class="text-lg font-bold mb-3"><i class="fas fa-history ml-1 text-cyan-400"></i>سجل العمليات الإدارية</h2>
+                <div id="logList" class="space-y-1.5 text-xs max-h-80 overflow-auto"></div>
+            </div>
+        </div>
+
+        <!-- لوحة الأسئلة والفئات -->
+        <div id="questionsPanel" class="hidden">
+            <div class="glass-panel p-5 rounded-2xl border border-slate-700 mb-4">
+                <h2 class="text-lg font-bold mb-3"><i class="fas fa-layer-group ml-1 text-emerald-400"></i>إضافة فئة جديدة</h2>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input id="newCatName" type="text" placeholder="اسم الفئة (مثال: علوم وتكنولوجيا)" class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-emerald-500 text-sm">
+                    <button id="addCatBtn" class="bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 rounded-lg font-bold text-sm transition"><i class="fas fa-plus ml-1"></i>إضافة فئة</button>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-slate-700 text-xs">
+                    <button id="exportBtn" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg font-bold"><i class="fas fa-download ml-1"></i>تصدير JSON</button>
+                    <label class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg font-bold cursor-pointer"><i class="fas fa-upload ml-1"></i>استيراد JSON
+                        <input id="importFile" type="file" accept="application/json,.json" class="hidden">
+                    </label>
+                </div>
+            </div>
+            <input id="qSearch" type="search" placeholder="بحث في نص الأسئلة والإجابات…" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 mb-3 text-sm">
+            <div id="catsList" class="space-y-3"></div>
+            <div id="noCatsMsg" class="glass-panel p-8 rounded-2xl text-center border-dashed border-2 border-slate-600 hidden">
+                <h2 class="text-xl text-gray-300 mb-1">لا توجد فئات بعد</h2>
+                <p class="text-gray-500 text-sm">أضف فئة جديدة بالأعلى، ثم أضف أسئلتها بالصعوبات المختلفة.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة مقهى يدوياً -->
+    <div id="addCafeModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-auto">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 my-8 border border-slate-600 shadow-2xl">
+            <h2 class="text-xl font-bold text-purple-400 mb-3">إضافة مقهى جديد</h2>
+            <form id="addCafeForm" class="space-y-3">
+                <input id="acName" type="text" placeholder="اسم المقهى *" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" required>
+                <input id="acCity" type="text" placeholder="المدينة" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                <input id="acPhone" type="tel" dir="ltr" placeholder="رقم الهاتف" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                <input id="acEmail" type="email" dir="ltr" placeholder="البريد الإلكتروني *" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" required>
+                <input id="acPass" type="password" dir="ltr" placeholder="كلمة المرور (6 أحرف على الأقل) *" minlength="6" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" required>
+                <p class="text-xs text-gray-400">يُنشأ الحساب ويُفعَّل مباشرة، ويمكن لصاحب المقهى تسجيل الدخول فوراً.</p>
+                <div id="acError" class="text-red-400 text-xs hidden bg-red-900/30 py-2 rounded text-center"></div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-500 py-2.5 rounded-lg font-bold text-sm transition">إنشاء وتفعيل</button>
+                    <button type="button" id="addCafeCancel" class="px-5 bg-slate-700 hover:bg-slate-600 py-2.5 rounded-lg font-bold text-sm transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل أو إضافة بيانات مقهى -->
+    <div id="cafeModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-auto">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 my-8 border border-slate-600 shadow-2xl">
+            <div class="flex justify-between items-center mb-3">
+                <h2 id="cafeModalTitle" class="text-xl font-bold text-purple-400">تعديل بيانات المقهى</h2>
+                <button id="cafeModalClose" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <form id="cafeForm" class="space-y-3">
+                <input type="hidden" id="cmUid">
+                <div><label class="block text-xs text-gray-400 mb-1">اسم المقهى *</label><input type="text" id="cmName" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" required></div>
+                <div><label class="block text-xs text-gray-400 mb-1">البريد الإلكتروني (لتسجيل الدخول / إعادة كلمة السر)</label><input type="email" id="cmEmail" dir="ltr" placeholder="cafe@example.com" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-xs text-gray-400 mb-1">المدينة</label><input type="text" id="cmCity" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-xs text-gray-400 mb-1">الحالة</label>
+                    <select id="cmStatus" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                        <option value="active">نشط</option>
+                        <option value="pending">قيد المراجعة</option>
+                        <option value="rejected">مرفوض</option>
+                        <option value="blocked">محظور</option>
+                    </select>
+                </div>
+                <div><label class="block text-xs text-gray-400 mb-1">رقم الهاتف</label><input type="tel" id="cmPhone" dir="ltr" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-xs text-gray-400 mb-1">أقصى عدد طاولات (0 = بدون حد)</label><input type="number" id="cmMax" min="0" value="10" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-xs text-gray-400 mb-1">ملاحظات إدارية</label><textarea id="cmNotes" rows="2" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></textarea></div>
+                <div><label class="block text-xs text-gray-400 mb-1">تاريخ انتهاء الاشتراك (فارغ = دائم)</label><input type="date" id="cmExp" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></div>
+                <div><label class="block text-xs text-gray-400 mb-1">رسالة تظهر لصاحب المقهى</label><input type="text" id="cmMsg" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">الألعاب المتاحة لهذا المقهى</label>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="cmG_board"> العبها صح</label>
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="cmG_mafia"> مافيا</label>
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="cmG_htns"> إنسان حيوان نبات</label>
+                        <label class="flex items-center gap-1.5"><input type="checkbox" id="cmG_race"> سباق الأسئلة</label>
+                    </div>
+                </div>
+                <div id="cafeFormError" class="text-red-400 text-xs hidden bg-red-900/30 py-2 rounded text-center"></div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" id="cmSubmitBtn" class="flex-1 bg-purple-600 hover:bg-purple-500 py-2.5 rounded-lg font-bold text-sm transition">حفظ</button>
+                    <button type="button" id="cafeModalCancel" class="px-5 bg-slate-700 hover:bg-slate-600 py-2.5 rounded-lg font-bold text-sm transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إرسال رسالة للمقهى -->
+    <div id="msgModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-auto">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 my-8 border border-slate-600 shadow-2xl">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                    <i class="fas fa-bullhorn"></i> رسالة للمقهى
+                </h2>
+                <button id="msgModalClose" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <p id="msgModalCafeName" class="text-xs text-emerald-300 mb-2 font-bold"></p>
+            <form id="msgForm" class="space-y-3">
+                <input type="hidden" id="msgModalUid">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">نص الرسالة (يظهر فوراً في شريط التنبيه داخل لوحة المقهى):</label>
+                    <textarea id="msgModalText" rows="3" maxlength="300" placeholder="مثال: يرجى التواصل مع الإدارة بخصوص تجديد الاشتراك..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"></textarea>
+                    <p class="text-[11px] text-gray-400 mt-1">اترك الرسالة فارغة واضغط حفظ لمسح أي رسالة حالية.</p>
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-amber-600 hover:bg-amber-500 py-2.5 rounded-lg font-bold text-sm text-slate-950 transition">حفظ وإرسال الرسالة</button>
+                    <button type="button" id="msgModalClear" class="px-3 bg-red-600/70 hover:bg-red-600 py-2.5 rounded-lg font-bold text-xs transition">مسح</button>
+                    <button type="button" id="msgModalCancel" class="px-4 bg-slate-700 hover:bg-slate-600 py-2.5 rounded-lg font-bold text-sm transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إعادة تعيين كلمة السر للمقهى -->
+    <div id="resetPassModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-auto">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 my-8 border border-slate-600 shadow-2xl">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl font-bold text-teal-400 flex items-center gap-2">
+                    <i class="fas fa-key"></i> إعادة كلمة السر
+                </h2>
+                <button id="resetModalClose" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <p id="resetModalCafeName" class="text-xs text-emerald-300 mb-2 font-bold"></p>
+            <form id="resetPassForm" class="space-y-3">
+                <input type="hidden" id="resetModalUid">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1">البريد الإلكتروني لحساب المقهى:</label>
+                    <input type="email" id="resetModalEmail" dir="ltr" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-teal-500" required>
+                    <p class="text-[11px] text-gray-400 mt-1">سيتم إرسال رابط رسمي ومباشر لتغيير كلمة السر إلى هذا البريد.</p>
+                </div>
+                <div id="resetModalFeedback" class="text-xs hidden p-2 rounded text-center font-bold"></div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" id="resetModalSubmitBtn" class="flex-1 bg-teal-600 hover:bg-teal-500 py-2.5 rounded-lg font-bold text-sm transition">إرسال رابط إعادة التعيين</button>
+                    <button type="button" id="resetModalCancel" class="px-5 bg-slate-700 hover:bg-slate-600 py-2.5 rounded-lg font-bold text-sm transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة/تعديل سؤال -->
+    <div id="qModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-auto">
+        <div class="glass-panel w-full max-w-lg rounded-2xl p-6 my-8 border border-slate-600 shadow-2xl">
+            <div class="flex justify-between items-center mb-3">
+                <h2 id="qModalTitle" class="text-xl font-bold text-emerald-400">إضافة سؤال</h2>
+                <button id="qModalClose" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <form id="qForm" class="space-y-3">
+                <input type="hidden" id="qCatId">
+                <input type="hidden" id="qId">
+                <div><label class="block text-xs text-gray-300 mb-1">نص السؤال *</label><textarea id="qText" rows="2" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" required></textarea></div>
+                <div><label class="block text-xs text-gray-300 mb-1">الإجابة الصحيحة *</label><input type="text" id="qAnswer" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" required></div>
+                <div><label class="block text-xs text-gray-300 mb-1">شرح الإجابة (اختياري)</label><input type="text" id="qExplanation" placeholder="معلومة تظهر بعد كشف الإجابة" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white"></div>
+                <div><label class="block text-xs text-gray-300 mb-1">رابط صورة أو فيديو يوتيوب (اختياري)</label><input type="url" id="qMediaUrl" dir="ltr" placeholder="https://..." class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white"></div>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-300 mb-1">الصعوبة</label>
+                        <select id="qDifficulty" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-2 text-xs text-white">
+                            <option value="easy">سهل (200)</option>
+                            <option value="medium" selected>متوسط (400)</option>
+                            <option value="hard">صعب (600)</option>
+                        </select>
+                    </div>
+                    <div><label class="block text-xs text-gray-300 mb-1">المؤقت (ثوانٍ)</label><input type="number" id="qTime" value="30" min="0" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-2 py-2 text-xs text-white"></div>
+                    <div><label class="block text-xs text-gray-300 mb-1">النقاط</label><input type="number" id="qPoints" value="400" readonly class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-xs text-gray-400"></div>
+                </div>
+                <div id="qFormError" class="text-red-400 text-xs hidden bg-red-900/30 py-2 rounded text-center"></div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-emerald-600 hover:bg-emerald-500 py-2.5 rounded-lg font-bold text-sm transition">حفظ السؤال</button>
+                    <button type="button" id="qModalCancel" class="px-5 bg-slate-700 hover:bg-slate-600 py-2.5 rounded-lg font-bold text-sm transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة فتح طاولة جديدة -->
+    <div id="tableModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-auto">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 my-8 border border-slate-600 shadow-2xl">
+            <h2 class="text-xl font-bold text-blue-400 mb-3">فتح طاولة جديدة</h2>
+            <form id="tableForm" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1 font-bold">نوع اللعبة</label>
+                    <select id="tmGame" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"></select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1 font-bold">كلمة سر الطاولة (فارغة = توليد كود تلقائي)</label>
+                    <input id="tmCode" type="text" dir="ltr" maxlength="12" placeholder="مثال: TBL10" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white uppercase focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1 font-bold">صلاحية الاستخدام</label>
+                    <select id="tmMode" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                        <option value="single">مرة واحدة فقط — تنتهي بعد لعبة فريق واحد</option>
+                        <option value="multi">عدد غير محدود — صالحة لأكثر من مباراة</option>
+                    </select>
+                </div>
+                <div id="tmError" class="text-red-400 text-xs hidden bg-red-900/30 py-2 rounded text-center"></div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-500 py-2.5 rounded-lg font-bold text-sm transition">تأكيد فتح الطاولة</button>
+                    <button type="button" id="tmCancel" class="px-5 bg-slate-700 hover:bg-slate-600 py-2.5 rounded-lg font-bold text-sm transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- نافذة توليد طاولات متعددة -->
+    <div id="bulkTableModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-auto">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-6 my-8 border border-slate-600 shadow-2xl">
+            <h2 class="text-xl font-bold text-purple-400 mb-3"><i class="fas fa-layer-group ml-1"></i>توليد طاولات متعددة دفعة واحدة</h2>
+            <form id="bulkTableForm" class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1 font-bold">عدد الطاولات (1 إلى 20)</label>
+                    <input id="bmCount" type="number" min="1" max="20" value="5" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500" required>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1 font-bold">نوع اللعبة</label>
+                    <select id="bmGame" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500"></select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1 font-bold">صلاحية الاستخدام</label>
+                    <select id="bmMode" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                        <option value="single">مرة واحدة فقط — كوبون ينتهي فور انتهاء المباراة</option>
+                        <option value="multi">متعدد الاستخدام — يبقى فعالاً على الطاولة</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-300 mb-1 font-bold">بادئة الرمز الاختيارية (مثال: TBL أو VIP)</label>
+                    <input id="bmPrefix" type="text" maxlength="4" placeholder="مثال: TBL" class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white uppercase focus:outline-none focus:border-purple-500">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="submit" class="flex-1 bg-purple-600 hover:bg-purple-500 py-2.5 rounded-lg font-bold text-sm transition">توليد الطاولات الآن</button>
+                    <button type="button" id="bmCancel" class="px-5 bg-slate-700 hover:bg-slate-600 py-2.5 rounded-lg font-bold text-sm transition">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- لوحة صاحب الكافيه (Cafe Admin View) -->
+    <div id="cafeAdminView" class="hidden w-full max-w-6xl">
+        <div id="annBanner" class="hidden mb-3 bg-yellow-500/15 border border-yellow-500/40 text-yellow-200 rounded-xl p-3 text-center text-sm font-bold"></div>
+        <div id="cafeNote" class="hidden mb-3 bg-blue-500/15 border border-blue-500/40 text-blue-200 rounded-xl p-3 text-center text-sm font-bold"></div>
+
+        <header class="flex flex-wrap justify-between items-center gap-3 mb-5 bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl">
+            <div>
+                <h1 class="text-2xl font-black text-blue-400 flex items-center gap-2">
+                    <i class="fas fa-chair"></i> إدارة طاولات الكافيه
+                </h1>
+                <p class="text-gray-400 text-sm mt-0.5">المقهى: <span id="currentCafeName" class="text-white font-bold"></span></p>
+                <p id="connStatus" class="text-xs mt-1 font-bold text-emerald-400">✓ الخادم متصل بنجاح</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/games.html" target="_blank" class="bg-amber-600/20 text-amber-300 border border-amber-500/30 hover:bg-amber-600 hover:text-slate-950 px-3.5 py-2 rounded-lg text-sm font-bold transition flex items-center gap-1.5">
+                    <i class="fas fa-gamepad ml-1"></i>بوابة الألعاب
+                </a>
+                <button id="logoutBtn" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-4 py-2 rounded-lg text-sm font-bold transition">
+                    <i class="fas fa-sign-out-alt ml-1"></i>خروج
+                </button>
+            </div>
+        </header>
+
+        <!-- شريط البث والتنبيهات المباشرة للطاولات -->
+        <div class="glass-panel p-4 rounded-2xl border border-slate-700/80 mb-5 flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 shadow-lg">
+            <div class="flex items-center gap-2">
+                <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 flex items-center justify-center font-bold text-sm">
+                    <i class="fas fa-broadcast-tower"></i>
+                </span>
+                <div>
+                    <h3 class="text-xs font-bold text-white">بث تنبيه مباشر لشاشات الطاولات</h3>
+                    <p class="text-[11px] text-gray-400">يظهر فوراً على شاشات الزبائن (عروض خاصة، جاهزية الطلبات، تنبيهات)</p>
+                </div>
+            </div>
+            <div class="flex-1 flex gap-2 min-w-[280px]">
+                <input id="cafeBroadInp" type="text" placeholder="اكتب التنبيه هنا (مثال: طلبكم جاهز للاستلام أو عرض خاص!)" class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-400">
+                <button id="cafeBroadBtn" class="bg-amber-600 hover:bg-amber-500 text-slate-950 px-4 py-1.5 rounded-lg text-xs font-bold transition">
+                    إرسال البث 📢
+                </button>
+                <button id="cafeBroadClearBtn" class="bg-slate-700 hover:bg-slate-600 text-gray-300 px-3 py-1.5 rounded-lg text-xs font-bold transition" title="مسح">
+                    مسح
+                </button>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap justify-between items-center gap-2 mb-5 bg-slate-800/60 p-4 rounded-xl border border-slate-700">
+            <h2 class="text-lg font-bold">الطاولات المفتوحة حالياً</h2>
+            <div class="flex flex-wrap gap-2">
+                <button id="printAllCafeTablesBtn" class="bg-slate-700 hover:bg-slate-600 px-3.5 py-2 rounded-lg shadow-lg font-bold text-sm transition">
+                    <i class="fas fa-print ml-1.5"></i>طباعة كل البطاقات
+                </button>
+                <button id="bulkTablesBtn" class="bg-purple-600 hover:bg-purple-500 px-3.5 py-2 rounded-lg shadow-lg font-bold text-sm transition">
+                    <i class="fas fa-layer-group ml-1.5"></i>توليد عدة طاولات
+                </button>
+                <button id="createTableBtn" class="bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg shadow-lg font-bold text-sm transition">
+                    <i class="fas fa-plus ml-1.5"></i>فتح طاولة جديدة
+                </button>
+            </div>
+        </div>
+
+        <div id="tablesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+        <div id="noTablesMsg" class="glass-panel p-8 rounded-2xl text-center border-dashed border-2 border-slate-600 mt-4 hidden">
+            <h2 class="text-xl text-gray-300 mb-1">لا توجد طاولات نشطة حالياً</h2>
+            <p class="text-gray-500 text-sm">اضغط على زر (فتح طاولة جديدة) لتوليد كود للزبائن للعب على الطاولة.</p>
+        </div>
+
+        <!-- الجوائز والمتصدرين للكافيه -->
+        <div class="glass-panel p-5 rounded-2xl border border-slate-700 mt-6 space-y-4">
+            <h2 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-gift text-yellow-400"></i> جوائز الفائزين ولوحة المتصدرين</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="flex items-center gap-2 bg-slate-800/60 p-3 rounded-lg border border-slate-700">
+                    <input type="checkbox" id="prActive" class="w-5 h-5 rounded">
+                    <label for="prActive" class="text-sm font-bold cursor-pointer">تفعيل جائزة لكل فائز</label>
+                </div>
+                <div class="md:col-span-2 flex gap-2">
+                    <input id="prTitle" type="text" maxlength="60" placeholder="اسم الجائزة (مثال: قهوة مجانية)" class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                    <select id="prMode" class="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white">
+                        <option value="every">كود لكل فائز بمباراة</option>
+                        <option value="weekly">جائزة المتصدر الأسبوعي</option>
+                    </select>
+                    <button id="prSave" class="bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded-lg font-bold text-sm transition">حفظ</button>
+                </div>
+            </div>
+
+            <!-- فحص وصرف كود الجائزة للكاشير -->
+            <div class="bg-slate-900/70 p-3.5 rounded-xl border border-yellow-500/30 space-y-2">
+                <div class="text-xs text-yellow-300 font-bold flex items-center gap-1.5">
+                    <i class="fas fa-cash-register"></i> نافذة الكاشير: التحقق الفوري من كود الجائزة وصرفه:
+                </div>
+                <div class="flex gap-2">
+                    <input id="verifyPrizeInput" type="text" dir="ltr" placeholder="اكتب كود الجائزة هنا" class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-sm text-white uppercase font-mono tracking-wider focus:outline-none focus:border-yellow-500 font-bold">
+                    <button id="verifyPrizeBtn" class="bg-yellow-600 hover:bg-yellow-500 text-slate-950 px-4 py-2 rounded-lg text-xs font-black transition">
+                        فحص وصرف ✓
+                    </button>
+                </div>
+                <div id="verifyPrizeMsg" class="text-xs hidden p-2 rounded font-bold"></div>
+            </div>
+
+            <div class="bg-slate-800/40 rounded-xl p-3 space-y-2 border border-slate-700/60">
+                <div class="text-xs text-gray-300 font-bold">رابط لوحة المتصدرين الخاص بهذا المقهى (لعرضه على شاشة الكافيه):</div>
+                <div class="flex gap-2">
+                    <input id="lbLink" type="text" readonly dir="ltr" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-gray-300">
+                    <button id="lbCopy" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-xs font-bold"><i class="fas fa-copy ml-1"></i>نسخ</button>
+                    <a id="lbOpen" target="_blank" rel="noopener" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg text-xs font-bold inline-flex items-center"><i class="fas fa-external-link-alt ml-1"></i>فتح</a>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="font-bold text-sm mb-2"><i class="fas fa-receipt ml-1 text-pink-400"></i>أكواد جوائز الفائزين غير المسلمة</h3>
+                <div id="claimsList" class="space-y-1.5 text-xs max-h-56 overflow-auto"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- المنطق البرمجي للوحة الإدارة والمقاهي -->
+    <script type="module">
+        import {
+            db, auth, isConfigured, firebaseConfig,
+            ref, query, limitToLast, onValue, get, set, update, remove, push,
+            signInWithEmailAndPassword, createUserWithEmailAndPassword,
+            signOut, onAuthStateChanged, sendPasswordResetEmail
+        } from './firebase-init.js';
+
+        const ADMIN_EMAIL = 'alardazain55@gmail.com';
+        const GAMES = { all: 'جميع الألعاب (مفتوح)', board: 'العبها صح', mafia: 'مافيا', htns: 'إنسان حيوان نبات', race: 'سباق الأسئلة' };
+
+        let currentUid = null;
+        let currentCafe = null;
+        let isAdmin = false;
+
+        let liveTables = {};
+        let indexUnsub = null;
+        let tokenUnsubs = {};
+
+        let cafesUnsub = null;
+        let allCafes = {};
+        let allTables = {};
+        let platform = {};
+        let gameLogs = [];
+        let allCats = {};
+
+        const $ = id => document.getElementById(id);
+        const dayMs = 864e5;
+        const fmt = ts => ts ? new Date(ts).toLocaleString('ar-JO', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+        const escapeHtml = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+        const cafeGames = c => ['all', ...Object.keys(GAMES).filter(k => k !== 'all' && (!c || !c.games || c.games[k] !== false))];
+
+        function showToast(text, type = 'info', duration = 3500) {
+            let box = $('toastContainer');
+            if (!box) {
+                box = document.createElement('div');
+                box.id = 'toastContainer';
+                box.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none';
+                document.body.appendChild(box);
+            }
+            const colors = {
+                success: 'bg-emerald-600 text-white border-emerald-400 shadow-emerald-950/60',
+                error: 'bg-red-600 text-white border-red-400 shadow-red-950/60',
+                warning: 'bg-amber-600 text-slate-950 font-bold border-amber-300 shadow-amber-950/60',
+                info: 'bg-slate-800 text-white border-slate-600 shadow-black/60'
+            };
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            const t = document.createElement('div');
+            t.className = `pointer-events-auto px-4 py-2.5 rounded-xl border shadow-xl text-xs font-bold transition-all duration-300 flex items-center gap-2 transform translate-y-2 opacity-0 ${colors[type] || colors.info}`;
+            t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${escapeHtml(text)}</span>`;
+            box.appendChild(t);
+            requestAnimationFrame(() => {
+                t.classList.remove('translate-y-2', 'opacity-0');
+            });
+            setTimeout(() => {
+                t.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => t.remove(), 300);
+            }, duration);
+        }
+        window.alert = (msg) => showToast(msg, 'info');
+
+        function generateToken(len = 6) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            const arr = new Uint32Array(len);
+            crypto.getRandomValues(arr);
+            let out = '';
+            for (let i = 0; i < len; i++) out += chars[arr[i] % chars.length];
+            return out;
+        }
+
+        const VIEWS = ['loginView', 'waitingView', 'blockedView', 'superAdminView', 'cafeAdminView'];
+        function showView(id) {
+            VIEWS.forEach(v => $(v).classList.add('hidden'));
+            const el = $(id);
+            el.classList.remove('hidden');
+            if (id === 'cafeAdminView' || id === 'superAdminView') el.classList.add('flex', 'flex-col');
+        }
+
+        function download(name, text, type) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([text], { type }));
+            a.download = name; a.click();
+            setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+        }
+
+        function logAct(action, detail) {
+            if (!isAdmin) return;
+            push(ref(db, 'auditLog'), { ts: Date.now(), action, detail: detail || '' });
+        }
+
+        // ==============================================================================
+        // المصادقة والتنقل
+        // ==============================================================================
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                currentUid = null; currentCafe = null; isAdmin = false;
+                showView('loginView');
+                return;
+            }
+
+            currentUid = user.uid;
+            const email = (user.email || '').toLowerCase();
+            isAdmin = email === ADMIN_EMAIL;
+
+            if (isAdmin) {
+                showView('superAdminView');
+                switchTab('cafes');
+                attachAdminListeners();
+                return;
+            }
+
+            // مقهى عادي
+            let snap = await get(ref(db, 'cafes/' + user.uid)).catch(() => null);
+            currentCafe = (snap && snap.exists()) ? snap.val() : null;
+
+            if (!currentCafe) {
+                // إذا كان حساب تجريبي محلي جديد
+                currentCafe = { cafeName: 'مقهى ' + user.email.split('@')[0], status: 'active', ownerEmail: user.email, createdAt: Date.now() };
+                await set(ref(db, 'cafes/' + user.uid), currentCafe);
+            }
+
+            if (currentCafe.status === 'active') {
+                showCafeDashboard();
+            } else if (currentCafe.status === 'pending') {
+                showView('waitingView');
+            } else {
+                $('blockedMsg').textContent = currentCafe.status === 'rejected' ? 'تم رفض الحساب من قبل الإدارة.' : 'الحساب محظور حالياً.';
+                showView('blockedView');
+            }
+        });
+
+        // ==============================================================================
+        // مستمعات لوحة الإدارة العليا
+        // ==============================================================================
+        function attachAdminListeners() {
+            onValue(ref(db, 'cafes'), (s) => {
+                allCafes = {};
+                if (s.exists()) s.forEach(c => { allCafes[c.key] = c.val(); });
+                drawCafes();
+            });
+
+            onValue(ref(db, 'tables'), (s) => {
+                allTables = {};
+                if (s.exists()) s.forEach(t => { allTables[t.key] = t.val(); });
+                drawAdminTables();
+                drawCafes();
+            });
+
+            onValue(ref(db, 'gameData/categories'), (s) => {
+                allCats = {};
+                if (s.exists()) s.forEach(c => { allCats[c.key] = c.val(); });
+                drawCats();
+            });
+
+            onValue(ref(db, 'settings/platform'), (s) => {
+                platform = s.exists() ? s.val() : {};
+                fillSettings();
+            });
+
+            onValue(query(ref(db, 'auditLog'), limitToLast(40)), (s) => {
+                const logs = [];
+                s.forEach(c => logs.push(c.val()));
+                $('logList').innerHTML = logs.length ? logs.reverse().map(i =>
+                    `<div class="bg-slate-800/60 rounded p-2 flex justify-between gap-2 border border-slate-700/50"><span><b>${escapeHtml(i.action)}</b>${i.detail ? ' — ' + escapeHtml(i.detail) : ''}</span><span class="text-gray-500 text-xs shrink-0">${fmt(i.ts)}</span></div>`
+                ).join('') : '<p class="text-gray-500">لا توجد عمليات بعد.</p>';
+            });
+
+            onValue(query(ref(db, 'gameLog'), limitToLast(100)), (s) => {
+                gameLogs = [];
+                s.forEach(c => gameLogs.push({ id: c.key, ...c.val() }));
+                drawGames();
+            });
+        }
+
+        function updateStats() {
+            const cs = Object.values(allCafes);
+            $('stCafesTotal').textContent = cs.length;
+            $('stCafesActive').textContent = cs.filter(c => c.status === 'active').length;
+            $('stCafesPending').textContent = cs.filter(c => c.status === 'pending').length;
+            $('stTablesActive').textContent = Object.keys(allTables).length;
+            const cats = Object.values(allCats);
+            $('stCats').textContent = cats.length;
+            $('stQuestions').textContent = cats.reduce((n, c) => n + Object.keys(c.questions || {}).length, 0);
+        }
+
+        // ---------- دوال وتنسيقات المقاهي والطاولات ----------
+        const tablesOf = uid => Object.entries(allTables).filter(([k, t]) => t.cafeId === uid);
+        const cafeName = t => (allCafes[t?.cafeId] || {}).cafeName || 'مقهى غير معروف';
+        function normPhone(p) { return String(p || '').replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^\d+]/g, ''); }
+        const telNum = p => normPhone(p);
+        const waNum = p => { let d = normPhone(p).replace(/^\+/, ''); if (d.startsWith('00')) d = d.slice(2); else if (d.startsWith('0')) d = '962' + d.slice(1); return d; };
+
+        function expLine(c) {
+            if (!c.expiresAt) return '';
+            const d = Math.ceil((c.expiresAt - Date.now()) / dayMs);
+            const cls = d < 0 ? 'text-red-300 bg-red-950/40 border border-red-800/40' : d <= 7 ? 'text-yellow-300 bg-yellow-950/40 border border-yellow-800/40' : 'text-emerald-300 bg-emerald-950/40 border border-emerald-800/40';
+            const txt = d < 0 ? `انتهى الاشتراك منذ ${-d} يوماً` : d === 0 ? 'ينتهي الاشتراك اليوم' : `ينتهي الاشتراك بعد ${d} يوماً`;
+            return `<p class="mt-2 text-xs rounded-lg p-2 font-bold ${cls}"><i class="fas fa-calendar-check ml-1"></i>${txt} (${new Date(c.expiresAt).toLocaleDateString('ar-JO')})</p>`;
+        }
+
+        function modeLine(t) {
+            const single = t.mode === 'single';
+            const st = single ? (t.claimedBy ? (t.state === 'finished' ? ' — مُستهلكة' : ' — قيد الاستخدام') : ' — لم تُستخدم بعد') : '';
+            return `<p class="mt-2 text-xs font-bold ${single ? 'text-orange-300' : 'text-cyan-300'}"><i class="fas fa-gamepad ml-1"></i>${GAMES[t.gameType] || GAMES.board} • <i class="fas ${single ? 'fa-ticket' : 'fa-infinity'} ml-1"></i>${single ? 'كلمة سر لمرة واحدة' : 'كلمة سر متعددة الاستخدام'}${st}</p>`;
+        }
+
+        function diffCounts(qs) {
+            const c = { easy: 0, medium: 0, hard: 0 };
+            Object.values(qs || {}).forEach(q => { c[q.difficulty || 'medium'] = (c[q.difficulty || 'medium'] || 0) + 1; });
+            const DIFF_LABEL = { easy: 'سهل', medium: 'متوسط', hard: 'صعب' };
+            const DIFF_COLOR = { easy: 'text-emerald-400', medium: 'text-yellow-400', hard: 'text-red-400' };
+            return ['easy', 'medium', 'hard'].map(d => `<span class="${DIFF_COLOR[d]} font-bold">${DIFF_LABEL[d]} ${c[d] || 0}${c[d] < 2 ? ' <span title="أقل من سؤالين بهذه الصعوبة" class="text-amber-400">⚠</span>' : ''}</span>`).join(' • ');
+        }
+
+        function drawCafes() {
+            updateStats();
+            const box = $('cafesContainer'), no = $('noCafesMsg');
+            const qv = ($('cafeSearch').value || '').trim().toLowerCase();
+            const sf = $('cafeFilter').value;
+            let entries = Object.entries(allCafes);
+            $('cafeCount').textContent = entries.length ? `(${entries.length} مقهى)` : '';
+
+            entries = entries.filter(([u, c]) => (sf === 'all' || c.status === sf) &&
+                (!qv || [c.cafeName, c.city, c.ownerEmail, c.phone].join(' ').toLowerCase().includes(qv)));
+            entries.sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+
+            box.innerHTML = '';
+            no.classList.toggle('hidden', entries.length > 0);
+
+            entries.forEach(([uid, c]) => {
+                const tl = tablesOf(uid);
+                const col = c.status === 'active' ? 'border-emerald-500' : c.status === 'pending' ? 'border-yellow-500' : 'border-red-500';
+                const B = (act, cls, ico, txt) => `<button data-act="${act}" data-uid="${uid}" class="${cls} py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center gap-1"><i class="fas ${ico}"></i>${txt}</button>`;
+                const btns = [
+                    c.status !== 'active' && B('accept', 'bg-emerald-600 hover:bg-emerald-500', 'fa-check', 'قبول'),
+                    c.status === 'pending' && B('reject', 'bg-yellow-600 hover:bg-yellow-500', 'fa-times', 'رفض'),
+                    c.status === 'active' && B('block', 'bg-orange-600 hover:bg-orange-500', 'fa-ban', 'حظر'),
+                    B('edit', 'bg-slate-700 hover:bg-slate-600', 'fa-pen', 'تعديل'),
+                    c.status === 'active' && B('extend', 'bg-teal-600 hover:bg-teal-500', 'fa-calendar-plus', 'تمديد 30 يوماً'),
+                    B('msg', 'bg-slate-700 hover:bg-slate-600', 'fa-bullhorn', 'رسالة للمقهى'),
+                    c.status === 'active' && B('opentable', 'bg-blue-600 hover:bg-blue-500', 'fa-plus', 'فتح طاولة'),
+                    c.phone && `<a href="tel:${escapeHtml(telNum(c.phone))}" class="bg-slate-700 hover:bg-slate-600 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center gap-1"><i class="fas fa-phone"></i>اتصال</a>`,
+                    c.phone && `<a href="https://wa.me/${escapeHtml(waNum(c.phone))}" target="_blank" rel="noopener" class="bg-green-600 hover:bg-green-500 py-1.5 px-3 rounded-lg text-xs font-bold transition flex items-center gap-1"><i class="fab fa-whatsapp"></i>واتساب</a>`,
+                    tl.length && B('closeall', 'bg-slate-700 hover:bg-slate-600', 'fa-door-closed', 'إغلاق طاولاته'),
+                    c.ownerEmail && B('reset', 'bg-slate-700 hover:bg-slate-600', 'fa-key', 'إعادة كلمة السر'),
+                    B('remove', 'bg-red-600/80 hover:bg-red-600', 'fa-trash', 'حذف')
+                ].filter(Boolean).join('');
+
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-4 rounded-xl border-r-4 shadow-md ' + col;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <h3 class="text-base font-bold text-white">${escapeHtml(c.cafeName || 'بدون اسم')}</h3>
+                            <p class="text-xs text-gray-400 mt-0.5"><i class="fas fa-city ml-1"></i>${escapeHtml(c.city || '—')} • <span dir="ltr">${escapeHtml(c.ownerEmail || '')}</span></p>
+                            ${c.phone ? `<p class="text-xs text-gray-400" dir="ltr"><i class="fas fa-phone ml-1"></i>${escapeHtml(c.phone)}</p>` : ''}
+                        </div>
+                        <span class="text-xs font-bold px-2 py-0.5 rounded ${c.status === 'active' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-yellow-500/20 text-yellow-300'}">${c.status === 'active' ? 'نشط' : (c.status === 'pending' ? 'قيد المراجعة' : 'محظور')}</span>
+                    </div>
+                    ${expLine(c)}
+                    <div class="flex gap-2 mt-2 text-xs">
+                        <span class="bg-slate-800 px-2 py-1 rounded">الطاولات: <b>${tl.length}${c.maxTables ? ' / ' + c.maxTables : ''}</b></span>
+                        <span class="bg-slate-800 px-2 py-1 rounded">الألعاب: <b>${cafeGames(c).map(k => GAMES[k]).join(', ')}</b></span>
+                    </div>
+                    ${c.notes ? `<p class="mt-2 text-xs text-yellow-300 bg-yellow-950/40 p-1.5 rounded border border-yellow-800/40"><i class="fas fa-sticky-note ml-1"></i>${escapeHtml(c.notes)}</p>` : ''}
+                    <div class="mt-3 flex flex-wrap gap-1.5 pt-2 border-t border-slate-700/60">${btns}</div>`;
+                box.appendChild(card);
+            });
+
+            box.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => handleAdminAction(b.dataset.act, b.dataset.uid)));
+        }
+
+        async function handleAdminAction(act, uid) {
+            const c = allCafes[uid] || {}, nm = c.cafeName || '';
+            if (act === 'accept') {
+                await update(ref(db, 'cafes/' + uid), { status: 'active', updatedAt: Date.now() });
+                showToast(`تم قبول وتفعيل مقهى "${nm}" بنجاح ✓`, 'success');
+                logAct('قبول مقهى', nm);
+            } else if (act === 'reject') {
+                await update(ref(db, 'cafes/' + uid), { status: 'rejected', updatedAt: Date.now() });
+                showToast(`تم رفض المقهى "${nm}"`, 'info');
+                logAct('رفض مقهى', nm);
+            } else if (act === 'block') {
+                await closeCafeTables(uid);
+                await update(ref(db, 'cafes/' + uid), { status: 'blocked', updatedAt: Date.now() });
+                showToast(`تم حظر المقهى "${nm}" وإغلاق جميع طاولاته بنجاح`, 'warning');
+                logAct('حظر مقهى', nm);
+            } else if (act === 'extend') {
+                const base = Math.max(Number(c.expiresAt) || 0, Date.now());
+                await update(ref(db, 'cafes/' + uid), { expiresAt: base + 30 * dayMs, updatedAt: Date.now() });
+                showToast(`تم تمديد اشتراك "${nm}" لمدة 30 يوماً ✓`, 'success');
+                logAct('تمديد اشتراك', nm + ' (+30 يوماً)');
+            } else if (act === 'msg') {
+                openMsgModal(uid);
+            } else if (act === 'closeall') {
+                await closeCafeTables(uid);
+                showToast(`تم إغلاق كل طاولات مقهى "${nm}" بنجاح ✓`, 'info');
+                logAct('إغلاق كل طاولات مقهى', nm);
+            } else if (act === 'reset') {
+                openResetModal(uid);
+            } else if (act === 'edit') {
+                openCafeModal(uid);
+            } else if (act === 'opentable') {
+                openTableModal(uid);
+            } else if (act === 'remove') {
+                await closeCafeTables(uid);
+                await remove(ref(db, 'cafes/' + uid));
+                showToast(`تم حذف المقهى "${nm}" بنجاح`, 'info');
+                logAct('حذف مقهى', nm);
+            }
+        }
+
+        async function closeCafeTables(uid) {
+            const toks = tablesOf(uid).map(([k]) => k);
+            for (const t of toks) await remove(ref(db, 'tables/' + t));
+            await remove(ref(db, 'cafeTables/' + uid));
+        }
+
+        function openCafeModal(uid) {
+            const isNew = !uid;
+            const c = isNew ? {} : (allCafes[uid] || {});
+            if ($('cafeModalTitle')) $('cafeModalTitle').textContent = isNew ? 'إضافة مقهى جديد' : 'تعديل بيانات المقهى';
+            if ($('cmSubmitBtn')) $('cmSubmitBtn').textContent = isNew ? 'إضافة المقهى الآن' : 'حفظ التعديلات';
+            if ($('cmUid')) $('cmUid').value = isNew ? '' : uid;
+            if ($('cmName')) $('cmName').value = c.cafeName || '';
+            if ($('cmEmail')) $('cmEmail').value = c.ownerEmail || '';
+            if ($('cmCity')) $('cmCity').value = c.city || '';
+            if ($('cmStatus')) $('cmStatus').value = c.status || 'active';
+            if ($('cmPhone')) $('cmPhone').value = c.phone || '';
+            if ($('cmMax')) $('cmMax').value = isNew ? 10 : (Number(c.maxTables) || 0);
+            if ($('cmNotes')) $('cmNotes').value = c.notes || '';
+            if ($('cmExp')) $('cmExp').value = c.expiresAt ? new Date(c.expiresAt).toISOString().slice(0, 10) : '';
+            if ($('cmMsg')) $('cmMsg').value = c.adminMessage || '';
+            ['board', 'mafia', 'htns', 'race'].forEach(k => {
+                const el = $('cmG_' + k);
+                if (el) el.checked = !c.games || c.games[k] !== false;
+            });
+            if ($('cafeFormError')) $('cafeFormError').classList.add('hidden');
+            if ($('cafeModal')) $('cafeModal').classList.remove('hidden');
+        }
+
+        $('cafeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let uid = $('cmUid') ? $('cmUid').value.trim() : '';
+            const isNew = !uid;
+            if (isNew) {
+                uid = 'cafe_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+            }
+            const nm = $('cmName') ? $('cmName').value.trim() : '';
+            if (!nm) return;
+            const email = $('cmEmail') ? $('cmEmail').value.trim() : '';
+            const cafeData = {
+                cafeName: nm,
+                ownerEmail: email || (isNew ? (nm.replace(/\s+/g, '').toLowerCase() + '@cafegames.local') : ((allCafes[uid] && allCafes[uid].ownerEmail) || '')),
+                city: $('cmCity') ? $('cmCity').value.trim() : '',
+                phone: $('cmPhone') ? $('cmPhone').value.trim() : '',
+                status: $('cmStatus') ? $('cmStatus').value : 'active',
+                maxTables: Math.max(0, Number($('cmMax') ? $('cmMax').value : 0) || 0),
+                notes: $('cmNotes') ? $('cmNotes').value.trim() : '',
+                expiresAt: ($('cmExp') && $('cmExp').value) ? new Date($('cmExp').value + 'T23:59:59').getTime() : (Date.now() + 30 * dayMs),
+                adminMessage: ($('cmMsg') && $('cmMsg').value.trim()) ? $('cmMsg').value.trim() : null,
+                games: {
+                    board: $('cmG_board') ? $('cmG_board').checked : true,
+                    mafia: $('cmG_mafia') ? $('cmG_mafia').checked : true,
+                    htns: $('cmG_htns') ? $('cmG_htns').checked : true,
+                    race: $('cmG_race') ? $('cmG_race').checked : true
+                },
+                updatedAt: Date.now()
+            };
+            if (isNew) {
+                cafeData.createdAt = Date.now();
+            }
+            try {
+                await set(ref(db, 'cafes/' + uid), cafeData);
+                if ($('cafeModal')) $('cafeModal').classList.add('hidden');
+                showToast(isNew ? `تمت إضافة المقهى "${nm}" بنجاح ✓` : `تم حفظ تعديلات "${nm}" بنجاح ✓`, 'success');
+                logAct(isNew ? 'إضافة مقهى جديد' : 'تعديل بيانات مقهى', nm);
+            } catch (err) {
+                console.error('Error saving cafe:', err);
+                if ($('cafeFormError')) {
+                    $('cafeFormError').textContent = 'حدث خطأ: ' + err.message;
+                    $('cafeFormError').classList.remove('hidden');
+                }
+            }
+        });
+        if ($('cafeModalClose')) $('cafeModalClose').onclick = () => $('cafeModal') && $('cafeModal').classList.add('hidden');
+        if ($('cafeModalCancel')) $('cafeModalCancel').onclick = () => $('cafeModal') && $('cafeModal').classList.add('hidden');
+        if ($('cafeModal')) $('cafeModal').onclick = (e) => {
+            if (e.target === $('cafeModal')) $('cafeModal').classList.add('hidden');
+        };
+
+        // إعداد نافذة رسالة للمقهى
+        function openMsgModal(uid) {
+            const c = allCafes[uid] || {};
+            if ($('msgModalUid')) $('msgModalUid').value = uid;
+            if ($('msgModalCafeName')) $('msgModalCafeName').textContent = 'المقهى: ' + (c.cafeName || uid);
+            if ($('msgModalText')) $('msgModalText').value = c.adminMessage || '';
+            if ($('msgModal')) $('msgModal').classList.remove('hidden');
+        }
+        if ($('msgForm')) {
+            $('msgForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const uid = $('msgModalUid') ? $('msgModalUid').value : '';
+                if (!uid) return;
+                const c = allCafes[uid] || {};
+                const text = $('msgModalText') ? $('msgModalText').value.trim() : '';
+                try {
+                    await update(ref(db, 'cafes/' + uid), { adminMessage: text || null, updatedAt: Date.now() });
+                    if ($('msgModal')) $('msgModal').classList.add('hidden');
+                    showToast(text ? `تم إرسال الرسالة إلى "${c.cafeName || ''}" بنجاح ✓` : `تم مسح رسالة المقهى بنجاح ✓`, 'success');
+                    logAct('رسالة لمقهى', c.cafeName || '');
+                } catch (err) {
+                    showToast('خطأ أثناء إرسال الرسالة: ' + err.message, 'error');
+                }
+            });
+        }
+        if ($('msgModalClear')) {
+            $('msgModalClear').onclick = async () => {
+                const uid = $('msgModalUid') ? $('msgModalUid').value : '';
+                if (!uid) return;
+                const c = allCafes[uid] || {};
+                try {
+                    await update(ref(db, 'cafes/' + uid), { adminMessage: null, updatedAt: Date.now() });
+                    if ($('msgModalText')) $('msgModalText').value = '';
+                    if ($('msgModal')) $('msgModal').classList.add('hidden');
+                    showToast(`تم مسح الرسالة لمقهى "${c.cafeName || ''}" ✓`, 'info');
+                    logAct('مسح رسالة مقهى', c.cafeName || '');
+                } catch (err) {
+                    showToast('خطأ: ' + err.message, 'error');
+                }
+            };
+        }
+        if ($('msgModalClose')) $('msgModalClose').onclick = () => $('msgModal') && $('msgModal').classList.add('hidden');
+        if ($('msgModalCancel')) $('msgModalCancel').onclick = () => $('msgModal') && $('msgModal').classList.add('hidden');
+        if ($('msgModal')) $('msgModal').onclick = (e) => {
+            if (e.target === $('msgModal')) $('msgModal').classList.add('hidden');
+        };
+
+        // إعداد نافذة إعادة كلمة السر
+        function openResetModal(uid) {
+            const c = allCafes[uid] || {};
+            if ($('resetModalUid')) $('resetModalUid').value = uid;
+            if ($('resetModalCafeName')) $('resetModalCafeName').textContent = 'المقهى: ' + (c.cafeName || uid);
+            if ($('resetModalEmail')) $('resetModalEmail').value = c.ownerEmail || '';
+            if ($('resetModalFeedback')) $('resetModalFeedback').classList.add('hidden');
+            if ($('resetPassModal')) $('resetPassModal').classList.remove('hidden');
+        }
+        if ($('resetPassForm')) {
+            $('resetPassForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const uid = $('resetModalUid') ? $('resetModalUid').value : '';
+                const email = $('resetModalEmail') ? $('resetModalEmail').value.trim() : '';
+                if (!email) {
+                    showToast('يرجى إدخال البريد الإلكتروني', 'error');
+                    return;
+                }
+                const c = allCafes[uid] || {};
+                const fb = $('resetModalFeedback');
+                const btn = $('resetModalSubmitBtn');
+                if (btn) { btn.disabled = true; btn.textContent = 'جارٍ إرسال الرابط...'; }
+                try {
+                    if (uid && c.ownerEmail !== email) {
+                        await update(ref(db, 'cafes/' + uid), { ownerEmail: email, updatedAt: Date.now() });
+                    }
+                    await sendPasswordResetEmail(auth, email);
+                    if (fb) {
+                        fb.className = 'text-xs p-2.5 rounded text-center font-bold bg-emerald-900/40 text-emerald-300 border border-emerald-500/40';
+                        fb.textContent = `✓ تم إرسال رابط إعادة تعيين كلمة السر إلى: ${email}`;
+                        fb.classList.remove('hidden');
+                    }
+                    showToast(`تم إرسال رابط إعادة تعيين كلمة السر إلى ${email} بنجاح ✓`, 'success');
+                    logAct('إرسال إعادة كلمة سر', (c.cafeName || '') + ' (' + email + ')');
+                    setTimeout(() => {
+                        if ($('resetPassModal')) $('resetPassModal').classList.add('hidden');
+                    }, 2500);
+                } catch (err) {
+                    console.error('Password reset error:', err);
+                    let msg = err.message || 'تعذر إرسال رابط إعادة التعيين';
+                    if (err.code === 'auth/user-not-found') {
+                        msg = 'هذا البريد غير مسجل كمستخدم في نظام المصادقة (يمكن للمقهى إنشاء حساب جديد به)';
+                    } else if (err.code === 'auth/invalid-email') {
+                        msg = 'صيغة البريد الإلكتروني غير صحيحة';
+                    }
+                    if (fb) {
+                        fb.className = 'text-xs p-2.5 rounded text-center font-bold bg-red-900/40 text-red-300 border border-red-500/40';
+                        fb.textContent = msg;
+                        fb.classList.remove('hidden');
+                    }
+                    showToast(msg, 'error');
+                } finally {
+                    if (btn) { btn.disabled = false; btn.textContent = 'إرسال رابط إعادة التعيين'; }
+                }
+            });
+        }
+        if ($('resetModalClose')) $('resetModalClose').onclick = () => $('resetPassModal') && $('resetPassModal').classList.add('hidden');
+        if ($('resetModalCancel')) $('resetModalCancel').onclick = () => $('resetPassModal') && $('resetPassModal').classList.add('hidden');
+        if ($('resetPassModal')) $('resetPassModal').onclick = (e) => {
+            if (e.target === $('resetPassModal')) $('resetPassModal').classList.add('hidden');
+        };
+
+        // ---------- إدارة كل الطاولات (Admin) ----------
+        function drawAdminTables() {
+            const box = $('adminTablesContainer'), no = $('noAdminTablesMsg');
+            const qv = ($('tableSearch').value || '').trim().toLowerCase(), sf = $('tableFilter').value;
+            const cafeName = t => (allCafes[t.cafeId] || {}).cafeName || 'مقهى غير معروف';
+            let es = Object.entries(allTables).filter(([k, t]) => {
+                const pl = Object.keys(t.players || {}).length > 0;
+                const st = pl ? 'playing' : 'idle';
+                return (sf === 'all' || sf === st) && (!qv || (k + ' ' + cafeName(t)).toLowerCase().includes(qv));
+            });
+            $('adminTableCount').textContent = es.length ? `(${es.length} طاولة)` : '';
+            box.innerHTML = '';
+            no.classList.toggle('hidden', es.length > 0);
+
+            es.forEach(([tok, t]) => {
+                const pl = Object.keys(t.players || {}).length > 0;
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-4 rounded-xl border-t-4 shadow-lg ' + (pl ? 'border-emerald-500' : 'border-blue-500');
+                card.innerHTML = `
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="min-w-0">
+                            <h3 class="font-bold text-base truncate text-white">${escapeHtml(cafeName(t))}</h3>
+                            <p class="text-xs text-gray-400 mt-0.5">طاولة ${escapeHtml(t.tableId)} • ${fmt(t.createdAt)}</p>
+                        </div>
+                        <span class="text-xs px-2 py-0.5 rounded font-bold shrink-0 ${pl ? 'bg-emerald-500/20 text-emerald-300' : 'bg-blue-500/20 text-blue-300'}">${pl ? 'قيد اللعب' : 'بانتظار'}</span>
+                    </div>
+                    <p class="mt-2 text-xs">الكود: <span class="font-mono tracking-widest bg-slate-800 px-2 py-0.5 rounded text-cyan-300 font-bold">${escapeHtml(tok)}</span></p>
+                    ${modeLine(t)}
+                    ${(t.team1Name || t.team2Name) ? `<div class="mt-2 bg-slate-800/80 rounded-lg p-2 text-xs flex justify-between font-bold"><span class="text-teal-300">${escapeHtml(t.team1Name || '—')}: ${Number(t.score1) || 0}</span><span class="text-pink-300">${escapeHtml(t.team2Name || '—')}: ${Number(t.score2) || 0}</span></div>` : ''}
+                    <div class="mt-3 grid grid-cols-2 gap-1.5 pt-2 border-t border-slate-700/60">
+                        <button data-tact="copy" data-tok="${tok}" class="bg-slate-700 hover:bg-slate-600 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-copy ml-1"></i>نسخ</button>
+                        <button data-tact="regen" data-tok="${tok}" class="bg-blue-600 hover:bg-blue-500 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-key ml-1"></i>كلمة جديدة</button>
+                        <button data-tact="score" data-tok="${tok}" class="bg-yellow-600 hover:bg-yellow-500 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-eraser ml-1"></i>تصفير النتيجة</button>
+                        <button data-tact="mode" data-tok="${tok}" class="bg-slate-700 hover:bg-slate-600 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-sync-alt ml-1"></i>${t.mode === 'single' ? 'لـ متعددة' : 'لـ مرة واحدة'}</button>
+                        <button data-tact="reset" data-tok="${tok}" class="bg-yellow-600 hover:bg-yellow-500 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-redo ml-1"></i>إعادة تفعيل</button>
+                        <button data-tact="print" data-tok="${tok}" class="bg-slate-700 hover:bg-slate-600 py-1.5 rounded-lg text-xs font-bold"><i class="fas fa-print ml-1"></i>طباعة</button>
+                        <button data-tact="close" data-tok="${tok}" class="bg-red-600/80 hover:bg-red-600 py-1.5 rounded-lg text-xs font-bold col-span-2">إغلاق الطاولة</button>
+                    </div>`;
+                box.appendChild(card);
+            });
+
+            box.querySelectorAll('[data-tact]').forEach(b => b.addEventListener('click', () => adminTableAction(b.dataset.tact, b.dataset.tok)));
+        }
+
+        async function adminTableAction(act, tok) {
+            const t = allTables[tok];
+            if (!t) return;
+            const nm = ((allCafes[t.cafeId] || {}).cafeName || '') + ' / طاولة ' + t.tableId;
+            if (act === 'copy') {
+                await navigator.clipboard.writeText(tok);
+                alert('تم نسخ كود الطاولة: ' + tok);
+            } else if (act === 'regen') {
+                await changeTableCode(tok);
+            } else if (act === 'score') {
+                await update(ref(db, 'tables/' + tok), { score1: 0, score2: 0 });
+                logAct('تصفير نتيجة طاولة', nm);
+            } else if (act === 'mode') {
+                await toggleTableMode(tok);
+            } else if (act === 'reset') {
+                await resetTable(tok);
+            } else if (act === 'print') {
+                printTable(tok, t);
+            } else if (act === 'close') {
+                if (confirm('إغلاق هذه الطاولة؟')) {
+                    await remove(ref(db, 'tables/' + tok));
+                    if (t.cafeId) await remove(ref(db, `cafeTables/${t.cafeId}/${tok}`));
+                    logAct('إغلاق طاولة', nm);
+                }
+            }
+        }
+
+        async function closeAllTables() {
+            const toks = Object.keys(allTables);
+            if (!toks.length) return alert('لا توجد طاولات مفتوحة.');
+            if (!confirm(`إغلاق كل الطاولات (${toks.length}) في كل المقاهي؟`)) return;
+            for (const k of toks) {
+                await remove(ref(db, 'tables/' + k));
+                if (allTables[k].cafeId) await remove(ref(db, `cafeTables/${allTables[k].cafeId}/${k}`));
+            }
+            logAct('إغلاق كل الطاولات', toks.length + ' طاولة');
+        }
+
+        // ---------- إدارة بنك الأسئلة والفئات ----------
+        function drawCats() {
+            updateStats();
+            const list = $('catsList'), noMsg = $('noCatsMsg');
+            const entries = Object.entries(allCats);
+            list.innerHTML = '';
+            noMsg.classList.toggle('hidden', entries.length > 0);
+            entries.sort((a, b) => (a[1].order || 0) - (b[1].order || 0));
+
+            const qsr = ($('qSearch').value || '').trim().toLowerCase();
+
+            entries.forEach(([catId, cat]) => {
+                const questions = cat.questions || {};
+                const qIds = Object.keys(questions).filter(id => {
+                    if (!qsr) return true;
+                    const q = questions[id];
+                    return (q.q + ' ' + q.a).toLowerCase().includes(qsr);
+                });
+
+                const box = document.createElement('div');
+                box.className = 'glass-panel rounded-xl border border-slate-700 overflow-hidden';
+                box.innerHTML = `
+                    <div class="flex flex-wrap justify-between items-center gap-2 bg-slate-800/80 p-3 border-b border-slate-700">
+                        <div>
+                            <span class="font-bold text-emerald-400 text-sm"><i class="fas fa-folder ml-1.5"></i>${escapeHtml(cat.name)}${cat.hidden ? ' <span class="text-xs text-yellow-400">(مخفية)</span>' : ''}</span>
+                            <div class="text-xs text-gray-400 mt-1">${diffCounts(questions)} • ${Object.keys(questions).length} سؤال</div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5">
+                            <button data-addq="${catId}" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-1 rounded text-xs font-bold">+ سؤال</button>
+                            <button data-rencat="${catId}" class="bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-xs font-bold" title="تعديل الاسم"><i class="fas fa-pen"></i></button>
+                            <button data-hidecat="${catId}" class="bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-xs font-bold" title="إخفاء/إظهار"><i class="fas ${cat.hidden ? 'fa-eye' : 'fa-eye-slash'}"></i></button>
+                            <button data-delcat="${catId}" class="bg-red-600/70 hover:bg-red-600 px-2 py-1 rounded text-xs font-bold"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="p-2 space-y-1.5">${qIds.length ? qIds.slice(0, 15).map(qid => {
+                        const q = questions[qid];
+                        return `<div class="bg-slate-900/40 p-2.5 rounded-lg text-xs flex justify-between items-center gap-2 border border-slate-800">
+                            <div class="truncate cursor-pointer hover:text-emerald-300 transition" data-editq="${qid}" data-cat="${catId}" title="اضغط لتعديل السؤال">
+                                <span class="font-bold text-white"><i class="fas fa-question-circle ml-1 text-emerald-400"></i>${escapeHtml(q.q)}</span>
+                                <span class="text-emerald-300 font-bold block mt-0.5">الإجابة: ${escapeHtml(q.a)} • ${q.points || 400} نقطة (${q.difficulty === 'easy' ? 'سهل' : (q.difficulty === 'hard' ? 'صعب' : 'متوسط')})</span>
+                            </div>
+                            <div class="flex gap-1 shrink-0">
+                                <button data-dupq="${qid}" data-cat="${catId}" class="bg-slate-700 hover:bg-slate-600 px-2 py-1 rounded text-[11px]" title="نسخ السؤال"><i class="fas fa-copy"></i></button>
+                                <button data-delq="${qid}" data-cat="${catId}" class="bg-red-600/70 hover:bg-red-600 px-2 py-1 rounded text-[11px]" title="حذف السؤال"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>`;
+                    }).join('') : '<p class="text-xs text-gray-500 p-2">لا توجد أسئلة مطابقة في هذه الفئة.</p>'}</div>`;
+                list.appendChild(box);
+            });
+
+            list.querySelectorAll('[data-addq]').forEach(b => b.addEventListener('click', () => {
+                if ($('qCatId')) $('qCatId').value = b.dataset.addq;
+                if ($('qId')) $('qId').value = '';
+                if ($('qModalTitle')) $('qModalTitle').textContent = 'إضافة سؤال جديد';
+                if ($('qForm')) $('qForm').reset();
+                if ($('qDifficulty')) $('qDifficulty').value = 'medium';
+                if ($('qPoints')) $('qPoints').value = 400;
+                if ($('qTime')) $('qTime').value = 30;
+                if ($('qFormError')) $('qFormError').classList.add('hidden');
+                if ($('qModal')) $('qModal').classList.remove('hidden');
+            }));
+            list.querySelectorAll('[data-editq]').forEach(el => el.addEventListener('click', () => {
+                const catId = el.dataset.cat, qid = el.dataset.editq;
+                const q = ((allCats[catId] || {}).questions || {})[qid];
+                if (!q) return;
+                if ($('qCatId')) $('qCatId').value = catId;
+                if ($('qId')) $('qId').value = qid;
+                if ($('qModalTitle')) $('qModalTitle').textContent = 'تعديل السؤال';
+                if ($('qText')) $('qText').value = q.q || '';
+                if ($('qAnswer')) $('qAnswer').value = q.a || '';
+                if ($('qExplanation')) $('qExplanation').value = q.explanation || '';
+                if ($('qMediaUrl')) $('qMediaUrl').value = q.mediaUrl || '';
+                if ($('qDifficulty')) $('qDifficulty').value = q.difficulty || 'medium';
+                if ($('qPoints')) $('qPoints').value = q.points || (q.difficulty === 'easy' ? 200 : (q.difficulty === 'hard' ? 600 : 400));
+                if ($('qTime')) $('qTime').value = q.timeLimit || 30;
+                if ($('qFormError')) $('qFormError').classList.add('hidden');
+                if ($('qModal')) $('qModal').classList.remove('hidden');
+            }));
+            list.querySelectorAll('[data-rencat]').forEach(b => b.addEventListener('click', () => renameCategory(b.dataset.rencat)));
+            list.querySelectorAll('[data-hidecat]').forEach(b => b.addEventListener('click', () => toggleHideCategory(b.dataset.hidecat)));
+            list.querySelectorAll('[data-delcat]').forEach(b => b.addEventListener('click', () => {
+                remove(ref(db, 'gameData/categories/' + b.dataset.delcat));
+                showToast('تم حذف الفئة بنجاح', 'info');
+            }));
+            list.querySelectorAll('[data-dupq]').forEach(b => b.addEventListener('click', () => dupQuestion(b.dataset.cat, b.dataset.dupq)));
+            list.querySelectorAll('[data-delq]').forEach(b => b.addEventListener('click', () => {
+                remove(ref(db, `gameData/categories/${b.dataset.cat}/questions/${b.dataset.delq}`));
+                showToast('تم حذف السؤال بنجاح', 'info');
+            }));
+        }
+
+        // معالجات نافذة السؤال (إغلاق، إلغاء، حفظ)
+        if ($('qModalClose')) $('qModalClose').onclick = () => $('qModal') && $('qModal').classList.add('hidden');
+        if ($('qModalCancel')) $('qModalCancel').onclick = () => $('qModal') && $('qModal').classList.add('hidden');
+        if ($('qModal')) $('qModal').onclick = (e) => {
+            if (e.target === $('qModal')) $('qModal').classList.add('hidden');
+        };
+
+        if ($('qDifficulty')) {
+            $('qDifficulty').addEventListener('change', (e) => {
+                const val = e.target.value;
+                if ($('qPoints')) {
+                    $('qPoints').value = val === 'easy' ? 200 : (val === 'hard' ? 600 : 400);
+                }
+            });
+        }
+
+        if ($('qForm')) {
+            $('qForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const catId = $('qCatId') ? $('qCatId').value : '';
+                const qid = ($('qId') && $('qId').value) ? $('qId').value : ('q_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6));
+                const text = $('qText') ? $('qText').value.trim() : '';
+                const ans = $('qAnswer') ? $('qAnswer').value.trim() : '';
+                const exp = $('qExplanation') ? $('qExplanation').value.trim() : '';
+                const media = $('qMediaUrl') ? $('qMediaUrl').value.trim() : '';
+                const diff = $('qDifficulty') ? $('qDifficulty').value : 'medium';
+                const tm = Number($('qTime') ? $('qTime').value : 30) || 30;
+                const pts = diff === 'easy' ? 200 : (diff === 'hard' ? 600 : 400);
+
+                if (!catId || !text || !ans) {
+                    if ($('qFormError')) {
+                        $('qFormError').textContent = 'يرجى إدخال نص السؤال والإجابة الصحيحة';
+                        $('qFormError').classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                try {
+                    await set(ref(db, `gameData/categories/${catId}/questions/${qid}`), {
+                        q: text,
+                        a: ans,
+                        explanation: exp,
+                        mediaUrl: media,
+                        difficulty: diff,
+                        points: pts,
+                        timeLimit: tm,
+                        createdAt: Date.now()
+                    });
+                    if ($('qModal')) $('qModal').classList.add('hidden');
+                    showToast('تم حفظ السؤال بنجاح ✓', 'success');
+                    logAct('حفظ سؤال', text);
+                } catch (err) {
+                    console.error('Error saving question:', err);
+                    if ($('qFormError')) {
+                        $('qFormError').textContent = 'حدث خطأ: ' + err.message;
+                        $('qFormError').classList.remove('hidden');
+                    }
+                }
+            });
+        }
+
+        async function renameCategory(id) {
+            const cur = (allCats[id] || {}).name || '';
+            const n = prompt('اسم الفئة الجديد:', cur);
+            if (!n || !n.trim()) return;
+            await update(ref(db, 'gameData/categories/' + id), { name: n.trim() });
+            logAct('تعديل اسم فئة', n.trim());
+        }
+
+        async function toggleHideCategory(id) {
+            const c = allCats[id] || {};
+            await update(ref(db, 'gameData/categories/' + id), { hidden: !c.hidden });
+            logAct(c.hidden ? 'إظهار فئة' : 'إخفاء فئة', c.name);
+        }
+
+        async function dupQuestion(catId, qid) {
+            const qs = (allCats[catId] || {}).questions || {};
+            const q = qs[qid];
+            if (!q) return;
+            const order = Object.values(qs).length + 1;
+            await set(push(ref(db, `gameData/categories/${catId}/questions`)), { ...q, order, createdAt: Date.now() });
+            logAct('نسخ سؤال', q.q);
+        }
+
+        function exportCats() {
+            download('categories.json', JSON.stringify({ exportedAt: Date.now(), categories: allCats }, null, 2), 'application/json');
+        }
+
+        async function importCats(file) {
+            try {
+                const j = JSON.parse(await file.text());
+                const src = j.categories || j;
+                const list = Array.isArray(src) ? src : Object.values(src);
+                let order = Object.values(allCats).length;
+                let nc = 0, nq = 0;
+                for (const c of list) {
+                    if (!c || !c.name) continue;
+                    const qsrc = c.questions ? (Array.isArray(c.questions) ? c.questions : Object.values(c.questions)) : [];
+                    const qobj = {};
+                    qsrc.forEach((q, i) => {
+                        if (!q || !q.q || !q.a) return;
+                        qobj['q' + Date.now().toString(36) + i] = {
+                            q: String(q.q), a: String(q.a), explanation: q.explanation || '', mediaUrl: q.mediaUrl || '',
+                            points: Number(q.points) || 400, timeLimit: Number(q.timeLimit) || 30, difficulty: q.difficulty || 'medium', order: i + 1, createdAt: Date.now()
+                        };
+                        nq++;
+                    });
+                    await set(push(ref(db, 'gameData/categories')), { name: String(c.name), order: ++order, hidden: false, createdAt: Date.now(), questions: qobj });
+                    nc++;
+                }
+                logAct('استيراد أسئلة', nc + ' فئة / ' + nq + ' سؤال');
+                alert(`تم استيراد ${nc} فئة و ${nq} سؤال بنجاح!`);
+            } catch(e) {
+                alert('تعذر استيراد الملف: ' + e.message);
+            }
+        }
+
+        // ---------- لوحة المباريات والإحصائيات ----------
+        function drawGames() {
+            if (!$('gamesList')) return;
+            const today = new Date().setHours(0, 0, 0, 0);
+            const per = {};
+            gameLogs.forEach(g => { per[g.cafeId] = (per[g.cafeId] || 0) + 1; });
+            const top = Object.entries(per).sort((a, b) => b[1] - a[1])[0];
+            $('gmTotal').textContent = gameLogs.length;
+            $('gmToday').textContent = gameLogs.filter(g => g.ts >= today).length;
+            $('gmTop').textContent = top ? (((allCafes[top[0]] || {}).cafeName) || 'غير معروف') + ' (' + top[1] + ')' : '—';
+            const rows = gameLogs.slice().sort((a, b) => b.ts - a.ts).slice(0, 100);
+            $('gamesList').innerHTML = rows.length ? rows.map(g => {
+                const cn = (allCafes[g.cafeId] || {}).cafeName || 'مقهى غير معروف';
+                const w = g.score1 === g.score2 ? 'تعادل' : ('الفائز: ' + (g.score1 > g.score2 ? g.team1Name : g.team2Name));
+                return `<div class="bg-slate-800/60 rounded-xl p-3 flex flex-wrap justify-between items-center gap-2 text-xs border border-slate-700/60">
+                    <span><b>${escapeHtml(cn)}</b> • ${escapeHtml(g.game || 'العبها صح')} • طاولة ${escapeHtml(g.tableId || '—')}</span>
+                    <span>${escapeHtml(g.team1Name)} <b class="text-teal-400 font-mono text-sm">${Number(g.score1) || 0}</b> — <b class="text-pink-400 font-mono text-sm">${Number(g.score2) || 0}</b> ${escapeHtml(g.team2Name)}</span>
+                    <span class="text-yellow-300 font-bold">${escapeHtml(w)}</span>
+                    <span class="text-gray-500">${fmt(g.ts)}</span>
+                </div>`;
+            }).join('') : '<p class="text-gray-500 text-sm">لا توجد مباريات مسجّلة بعد. تُسجَّل كل مباراة فور انتهائها على الطاولة.</p>';
+        }
+
+        function exportCafesCsv() {
+            const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+            const rows = [['المقهى', 'المدينة', 'البريد', 'الهاتف', 'الحالة', 'عدد الطاولات', 'تاريخ التسجيل', 'ملاحظات']];
+            Object.entries(allCafes).forEach(([u, c]) => rows.push([c.cafeName, c.city, c.ownerEmail, c.phone, c.status, tablesOf(u).length, fmt(c.createdAt), c.notes]));
+            download('cafes.csv', '\ufeff' + rows.map(r => r.map(q).join(',')).join('\n'), 'text/csv;charset=utf-8');
+        }
+
+        function exportGamesCsv() {
+            const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+            const rows = [['المقهى', 'الطاولة', 'الفريق الأول', 'نقاطه', 'الفريق الثاني', 'نقاطه', 'الوقت']];
+            gameLogs.slice().sort((a, b) => b.ts - a.ts).forEach(g => rows.push([(allCafes[g.cafeId] || {}).cafeName, g.tableId, g.team1Name, g.score1, g.team2Name, g.score2, fmt(g.ts)]));
+            download('games.csv', '\ufeff' + rows.map(r => r.map(q).join(',')).join('\n'), 'text/csv;charset=utf-8');
+        }
+
+        function backupAll() {
+            download('alabha-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ exportedAt: Date.now(), cafes: allCafes, categories: allCats, settings: platform }, null, 2), 'application/json');
+            logAct('نسخة احتياطية كاملة للمنصة');
+        }
+
+        async function cleanIdleTables() {
+            const h = Math.max(1, Number($('cleanHours').value) || 6), limit = Date.now() - h * 36e5;
+            const idle = Object.entries(allTables).filter(([k, t]) => !Object.keys(t.players || {}).length && (t.createdAt || 0) < limit);
+            if (!idle.length) return alert('لا توجد طاولات خاملة أقدم من ' + h + ' ساعة.');
+            if (!confirm(`إغلاق ${idle.length} طاولة خاملة؟`)) return;
+            for (const [k, t] of idle) {
+                await remove(ref(db, 'tables/' + k));
+                if (t.cafeId) await remove(ref(db, `cafeTables/${t.cafeId}/${k}`));
+            }
+            logAct('تنظيف طاولات خاملة', idle.length + ' طاولة');
+        }
+
+        async function purgeRejected() {
+            const ids = Object.entries(allCafes).filter(([u, c]) => c.status === 'rejected').map(([u]) => u);
+            if (!ids.length) return alert('لا توجد مقاهي مرفوضة.');
+            if (!confirm(`حذف ${ids.length} مقهى مرفوض نهائياً؟`)) return;
+            for (const u of ids) {
+                await closeCafeTables(u);
+                await remove(ref(db, 'cafes/' + u));
+            }
+            logAct('حذف المقاهي المرفوضة', ids.length + ' مقهى');
+        }
+
+        async function approveAllPending() {
+            const entries = Object.entries(allCafes).filter(([u, c]) => c.status === 'pending' || c.status === 'waiting' || !c.status);
+            if (!entries.length) {
+                showToast('لا توجد مقاهي قيد المراجعة حالياً.', 'info');
+                return;
+            }
+            for (const [u] of entries) {
+                await update(ref(db, 'cafes/' + u), { status: 'active', updatedAt: Date.now() });
+            }
+            showToast(`تم قبول وتفعيل جميع المقاهي المعلقة (${entries.length} مقهى) بنجاح ✓`, 'success');
+            logAct('قبول جماعي للمقاهي', entries.length + ' مقهى');
+        }
+
+        function fillSettings() {
+            if ($('setMaint')) $('setMaint').checked = Boolean(platform.maintenance);
+            if ($('setMaintMsg')) $('setMaintMsg').value = platform.maintenanceMsg || '';
+            if ($('setAnn')) $('setAnn').value = platform.announcement || '';
+            if ($('setMax')) $('setMax').value = Number(platform.defaultMaxTables) || 0;
+            if ($('setPicks')) $('setPicks').value = Number(platform.picksPerTeam) || 3;
+            if ($('setTimer')) $('setTimer').value = Number(platform.defaultTimer) || 30;
+        }
+
+        async function saveSettings() {
+            await set(ref(db, 'settings/platform'), {
+                maintenance: $('setMaint') ? $('setMaint').checked : false,
+                maintenanceMsg: $('setMaintMsg') ? $('setMaintMsg').value.trim() : '',
+                announcement: $('setAnn') ? $('setAnn').value.trim() : '',
+                defaultMaxTables: Math.max(0, Number($('setMax') ? $('setMax').value : 0) || 0),
+                picksPerTeam: Math.min(5, Math.max(1, Number($('setPicks') ? $('setPicks').value : 3) || 3)),
+                defaultTimer: Math.max(0, Number($('setTimer') ? $('setTimer').value : 30) || 30),
+                updatedAt: Date.now()
+            });
+            logAct('تحديث إعدادات المنصة');
+            alert('تم حفظ إعدادات المنصة بنجاح ✓');
+        }
+
+        // ==============================================================================
+        // لوحة صاحب الكافيه (Cafe Dashboard)
+        // ==============================================================================
+        function showCafeDashboard() {
+            $('currentCafeName').textContent = currentCafe?.cafeName || 'الكافيه';
+            showView('cafeAdminView');
+            watchCafeTables();
+            watchCafePrizes();
+        }
+
+        function watchCafeTables() {
+            onValue(ref(db, 'tables'), (s) => {
+                liveTables = {};
+                if (s.exists()) {
+                    s.forEach(t => {
+                        if (t.val().cafeId === currentUid) liveTables[t.key] = t.val();
+                    });
+                }
+                drawCafeTables();
+            });
+        }
+
+        function drawCafeTables() {
+            const box = $('tablesContainer'), no = $('noTablesMsg');
+            const entries = Object.entries(liveTables);
+            box.innerHTML = '';
+            no.classList.toggle('hidden', entries.length > 0);
+
+            entries.sort((a, b) => (a[1].tableId || 0) - (b[1].tableId || 0));
+
+            entries.forEach(([token, live]) => {
+                const playersArr = Object.values(live.players || {});
+                const connected = playersArr.length > 0;
+                const hasGameData = Boolean(live.team1Name || live.team2Name || live.score1 || live.score2);
+
+                const card = document.createElement('div');
+                card.className = 'glass-panel p-5 rounded-2xl border-t-4 relative flex flex-col justify-between shadow-lg ' +
+                    (connected ? 'border-emerald-500' : 'border-blue-500');
+
+                let statusHtml = '';
+                if (hasGameData) {
+                    const connLine = connected
+                        ? `<p class="text-emerald-400 font-bold mb-1 text-xs"><i class="fas fa-users ml-1"></i> متصل الآن: ${escapeHtml(playersArr[0]?.name || '')}</p>`
+                        : `<p class="text-yellow-400 font-bold mb-1 text-xs"><i class="fas fa-clock ml-1"></i> آخر نتيجة مسجلة</p>`;
+                    statusHtml = `
+                        <div class="mt-3 bg-slate-800/80 rounded-xl p-2.5 text-xs border border-slate-700/60">
+                            ${connLine}
+                            <div class="flex justify-between text-white font-bold text-sm pt-1">
+                                <span class="text-teal-300">${escapeHtml(live.team1Name || '—')}: ${Number(live.score1) || 0}</span>
+                                <span class="text-pink-300">${escapeHtml(live.team2Name || '—')}: ${Number(live.score2) || 0}</span>
+                            </div>
+                        </div>`;
+                } else {
+                    statusHtml = `<p class="mt-2 text-xs text-gray-400 bg-slate-800/50 p-2 rounded-lg text-center">بانتظار انضمام اللاعبين…</p>`;
+                }
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-bold">طاولة رقم ${escapeHtml(live.tableId)}</h3>
+                                <p class="text-xs text-gray-400 mt-0.5">الرمز السري: <span class="text-white font-mono uppercase bg-slate-800 px-2 py-0.5 rounded tracking-widest text-sm font-bold">${escapeHtml(token)}</span></p>
+                            </div>
+                            <span class="text-xs px-2.5 py-1 rounded-full font-bold ${connected ? 'bg-emerald-500/20 text-emerald-300' : 'bg-blue-500/20 text-blue-300'}">${connected ? 'قيد اللعب' : 'طاولة نشطة'}</span>
+                        </div>
+                        ${modeLine(live)}
+                        <div class="mt-2 text-xs text-gray-300">
+                            <i class="fas fa-gamepad ml-1 text-cyan-400"></i> اللعبة: <b class="text-white">${escapeHtml(GAMES[live.gameType] || live.game || 'العبها صح')}</b>
+                        </div>
+                        ${statusHtml}
+                    </div>
+                    <div class="mt-4 grid grid-cols-2 gap-1.5 w-full pt-2 border-t border-slate-700/50">
+                        <button data-ctab="code" data-ctok="${escapeHtml(token)}" class="bg-blue-600 hover:bg-blue-500 py-1.5 rounded-lg text-xs font-bold transition"><i class="fas fa-key ml-1"></i>تغيير الكلمة</button>
+                        <button data-ctab="mode" data-ctok="${escapeHtml(token)}" class="bg-slate-700 hover:bg-slate-600 py-1.5 rounded-lg text-xs font-bold transition"><i class="fas fa-sync-alt ml-1"></i>${live.mode === 'single' ? 'لـ متعددة' : 'لـ مرة واحدة'}</button>
+                        <button data-ctab="reset" data-ctok="${escapeHtml(token)}" class="bg-yellow-600 hover:bg-yellow-500 py-1.5 rounded-lg text-xs font-bold transition"><i class="fas fa-redo ml-1"></i>إعادة تفعيل</button>
+                        <button data-ctab="print" data-ctok="${escapeHtml(token)}" class="bg-slate-700 hover:bg-slate-600 py-1.5 rounded-lg text-xs font-bold transition"><i class="fas fa-qrcode ml-1"></i>طباعة QR</button>
+                        <button data-ctab="close" data-tok="${escapeHtml(token)}" class="bg-red-600/80 hover:bg-red-600 py-1.5 rounded-lg text-xs font-bold transition col-span-2">إغلاق الطاولة</button>
+                    </div>
+                `;
+                box.appendChild(card);
+            });
+
+            box.querySelectorAll('[data-ctab]').forEach(b => b.addEventListener('click', () => cafeTableAction(b.dataset.ctab, b.dataset.ctok || b.dataset.tok)));
+        }
+
+        async function cafeTableAction(act, tok) {
+            const t = liveTables[tok];
+            if (!t) return;
+            if (act === 'code') {
+                await changeTableCode(tok);
+            } else if (act === 'mode') {
+                await toggleTableMode(tok);
+            } else if (act === 'reset') {
+                await resetTable(tok);
+            } else if (act === 'lock') {
+                const newLock = !t.locked;
+                await update(ref(db, 'tables/' + tok), { locked: newLock });
+                alert(newLock ? 'تم قفل الطاولة مؤقتاً عن بُعد 🔒' : 'تم استئناف وفتح الطاولة 🔓');
+            } else if (act === 'msg') {
+                const m = prompt('اكتب رسالة تظهر فوراً على شاشة هذه الطاولة فقط:', t.alertMessage || '');
+                if (m === null) return;
+                await update(ref(db, 'tables/' + tok), { alertMessage: m.trim() || null });
+                alert('تم إرسال التنبيه للطاولة بنجاح ✓');
+            } else if (act === 'sec') {
+                const s = prompt('حدد موقع أو تسمية الطاولة (مثلاً: التراس، الصالة، VIP):', t.section || '');
+                if (s === null) return;
+                await update(ref(db, 'tables/' + tok), { section: s.trim() || null });
+            } else if (act === 'print') {
+                printTable(tok, t);
+            } else if (act === 'close') {
+                if (confirm('إغلاق هذه الطاولة نهائياً؟')) {
+                    await remove(ref(db, 'tables/' + tok));
+                    await remove(ref(db, `cafeTables/${currentUid}/${tok}`));
+                }
+            }
+        }
+
+        async function changeTableCode(tok) {
+            const t = isAdmin ? allTables[tok] : liveTables[tok];
+            if (!t) return;
+            const raw = prompt('اكتب كلمة السر الجديدة (4 إلى 12 حرفاً أو رقماً إنجليزياً)، أو اتركها فارغة لتوليد كود تلقائي:', '');
+            if (raw === null) return;
+            let nt;
+            if (raw.trim()) {
+                nt = String(raw.trim()).toUpperCase().replace(/[^A-Z0-9]/g, '');
+                if (nt.length < 4 || nt.length > 12) return alert('الكلمة يجب أن تكون بين 4 و 12 حرفاً أو رقماً.');
+            } else {
+                nt = generateToken(6);
+            }
+            if (nt === tok) return;
+            const ex = await get(ref(db, 'tables/' + nt));
+            if (ex.exists()) return alert('هذه الكلمة مستخدمة لطاولة أخرى، اختر غيرها.');
+            const { players, claimedBy, ...rest } = t;
+            await set(ref(db, 'tables/' + nt), { ...rest, state: 'waiting', createdAt: Date.now() });
+            if (t.cafeId) await set(ref(db, `cafeTables/${t.cafeId}/${nt}`), true);
+            await remove(ref(db, 'tables/' + tok));
+            if (t.cafeId) await remove(ref(db, `cafeTables/${t.cafeId}/${tok}`));
+            alert('تم تغيير كلمة السر إلى: ' + nt);
+        }
+
+        async function toggleTableMode(tok) {
+            const t = isAdmin ? allTables[tok] : liveTables[tok];
+            if (!t) return;
+            const newMode = t.mode === 'single' ? 'multi' : 'single';
+            await update(ref(db, 'tables/' + tok), { mode: newMode, claimedBy: null });
+        }
+
+        async function resetTable(tok) {
+            if (!confirm('إعادة تفعيل الطاولة؟ سيتم تصفير نتيجتها وإتاحتها للعب من جديد.')) return;
+            await update(ref(db, 'tables/' + tok), { claimedBy: null, state: 'waiting', score1: 0, score2: 0, team1Name: '', team2Name: '', locked: false, alertMessage: null });
+            await remove(ref(db, `tables/${tok}/players`));
+        }
+
+        let currentTableCafeUid = null;
+        function openTableModal(uid) {
+            currentTableCafeUid = uid || currentUid;
+            if ($('tmCode')) $('tmCode').value = '';
+            if ($('tmMode')) $('tmMode').value = 'single';
+            const c = currentTableCafeUid ? allCafes[currentTableCafeUid] : currentCafe;
+            if ($('tmGame')) $('tmGame').innerHTML = cafeGames(c).map(k => `<option value="${k}">${GAMES[k]}</option>`).join('');
+            if ($('tableModal')) $('tableModal').classList.remove('hidden');
+        }
+
+        if ($('createTableBtn')) $('createTableBtn').onclick = () => openTableModal(currentUid);
+        if ($('tmCancel')) $('tmCancel').onclick = () => $('tableModal') && $('tableModal').classList.add('hidden');
+
+        if ($('tableForm')) $('tableForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const uid = currentTableCafeUid || currentUid;
+            let code = $('tmCode') ? $('tmCode').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
+            if (!code) code = generateToken(6);
+            const gameType = ($('tmGame') && $('tmGame').value) || 'board';
+            const mode = ($('tmMode') && $('tmMode').value) || 'single';
+            const newId = Object.keys(liveTables).length + 1;
+
+            await set(ref(db, 'tables/' + code), {
+                cafeId: uid,
+                tableId: newId,
+                game: GAMES[gameType] || 'العبها صح',
+                gameType,
+                mode,
+                state: 'waiting',
+                createdAt: Date.now()
+            });
+
+            await set(ref(db, `cafeTables/${uid}/${code}`), true);
+            if ($('tableModal')) $('tableModal').classList.add('hidden');
+        };
+
+        function printTable(tok, t) {
+            const base = location.origin + '/games.html';
+            const link = `${base}?code=${encodeURIComponent(tok)}`;
+            const cafe = (isAdmin ? (allCafes[t?.cafeId] || {}).cafeName : currentCafe?.cafeName) || 'الكافيه';
+            const w = window.open('', '_blank', 'width=450,height=700');
+            if (!w) return alert('يرجى السماح بالنوافذ المنبثقة للطباعة.');
+            w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>طاولة ${tok}</title><style>body{font-family:Tahoma,sans-serif;text-align:center;padding:24px;color:#111}h1{margin:0 0 4px;font-size:26px}h2{margin:0 0 16px;color:#333}.code{font-size:42px;letter-spacing:6px;font-weight:900;border:3px dashed #111;border-radius:14px;padding:12px;margin:16px 0;display:inline-block;direction:ltr}img{width:220px;height:220px;margin:12px 0}</style></head><body><h1>${escapeHtml(cafe)}</h1><h2>طاولة ${t?.tableId || ''} — بوابة الألعاب 🎮</h2><img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(link)}" alt="QR" onload="window.print()"><p>امسح الكود بكاميرا الجوال للدخول واختيار لعبتك المفضلة فوراً</p><p>أو اكتب الكود يدوياً:</p><div class="code">${escapeHtml(tok)}</div><p style="font-size:12px;color:#666">استمتعوا باللعبة والتحدي مع أصدقائكم!</p></body></html>`);
+            w.document.close();
+        }
+
+        // ---------- الجوائز والمتصدرين ----------
+        function watchCafePrizes() {
+            const uid = currentUid;
+            const link = `${location.origin}/leaderboard.html?cafe=${encodeURIComponent(uid)}`;
+            $('lbLink').value = link;
+            $('lbOpen').href = link;
+            $('lbCopy').onclick = () => {
+                navigator.clipboard.writeText(link);
+                alert('تم نسخ الرابط ✓');
+            };
+
+            onValue(ref(db, 'prizeClaims/' + uid), (s) => {
+                const claims = [];
+                s.forEach(c => claims.push({ id: c.key, ...c.val() }));
+                claims.sort((a, b) => b.ts - a.ts);
+                $('claimsList').innerHTML = claims.length ? claims.map(c => `
+                    <div class="flex justify-between items-center bg-slate-800/60 p-2 rounded border border-slate-700/40">
+                        <span>كود: <b class="text-yellow-300 font-mono tracking-wider">${c.code}</b> — ${escapeHtml(c.name)} (${escapeHtml(c.title)})</span>
+                        ${c.claimed ? '<span class="text-emerald-400 font-bold">تم التسليم ✓</span>' : `<button data-claim="${c.id}" class="bg-emerald-600 hover:bg-emerald-500 px-2 py-0.5 rounded font-bold">تسليم</button>`}
+                    </div>`).join('') : '<p class="text-gray-500">لا توجد أكواد جوائز معلقة.</p>';
+
+                $('claimsList').querySelectorAll('[data-claim]').forEach(b => b.addEventListener('click', () => {
+                    update(ref(db, `prizeClaims/${uid}/${b.dataset.claim}`), { claimed: true });
+                }));
+            });
+        }
+
+        if ($('prSave')) $('prSave').onclick = async () => {
+            const title = $('prTitle') ? $('prTitle').value.trim() : '';
+            const active = $('prActive') ? $('prActive').checked : false;
+            const mode = $('prMode') ? $('prMode').value : 'free_drink';
+            await update(ref(db, 'cafePublic/' + currentUid), {
+                name: currentCafe?.cafeName || '',
+                prize: { active, title: title || 'قهوة مجانية', mode }
+            });
+            alert('تم حفظ إعدادات الجائزة بنجاح ✓');
+        };
+
+        // التحقق من كود الجائزة وصرفه للكاشير
+        if ($('verifyPrizeBtn')) $('verifyPrizeBtn').onclick = async () => {
+            const raw = ($('verifyPrizeInput') ? $('verifyPrizeInput').value : '').trim().toUpperCase();
+            const msg = $('verifyPrizeMsg');
+            msg.className = 'text-xs p-2.5 rounded font-bold';
+            if (!raw) {
+                msg.textContent = 'يرجى كتابة كود الجائزة أولاً.';
+                msg.className += ' bg-red-950/60 text-red-300 border border-red-800';
+                msg.classList.remove('hidden');
+                return;
+            }
+
+            const s = await get(ref(db, 'prizeClaims/' + currentUid));
+            let matchId = null, matchData = null;
+            if (s.exists()) {
+                s.forEach(c => {
+                    if (String(c.val().code || '').toUpperCase() === raw) {
+                        matchId = c.key; matchData = c.val();
+                    }
+                });
+            }
+
+            if (!matchId) {
+                msg.textContent = '❌ كود الجائزة غير موجود أو غير مسجل في هذا المقهى!';
+                msg.className += ' bg-red-950/60 text-red-300 border border-red-800';
+                msg.classList.remove('hidden');
+            } else if (matchData.claimed) {
+                msg.textContent = `⚠️ هذه الجائزة تم صرفها مسبقاً! (الفائز: ${matchData.name || 'لاعب'} — الجائزة: ${matchData.title || ''})`;
+                msg.className += ' bg-yellow-950/60 text-yellow-300 border border-yellow-800';
+                msg.classList.remove('hidden');
+            } else {
+                await update(ref(db, `prizeClaims/${currentUid}/${matchId}`), { claimed: true, redeemedAt: Date.now() });
+                msg.textContent = `✅ تم تأكيد وصرف الجائزة بنجاح! مبروك لـ ${matchData.name || 'الفائز'} (${matchData.title || ''}) 🎉`;
+                msg.className += ' bg-emerald-950/60 text-emerald-300 border border-emerald-800';
+                msg.classList.remove('hidden');
+                $('verifyPrizeInput').value = '';
+            }
+        };
+
+        // توليد طاولات مجمعة دفعة واحدة
+        $('bulkTablesBtn').onclick = () => {
+            const c = currentCafe;
+            $('bmGame').innerHTML = cafeGames(c).map(k => `<option value="${k}">${GAMES[k]}</option>`).join('');
+            $('bulkTableModal').classList.remove('hidden');
+        };
+        $('bmCancel').onclick = () => $('bulkTableModal').classList.add('hidden');
+
+        $('bulkTableForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const count = Math.min(20, Math.max(1, Number($('bmCount').value) || 5));
+            const gameType = $('bmGame').value || 'board';
+            const mode = $('bmMode').value;
+            const prefix = ($('bmPrefix').value || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            const uid = currentUid;
+            let currentCount = Object.keys(liveTables).length;
+
+            for (let i = 1; i <= count; i++) {
+                const rnd = generateToken(5);
+                const code = prefix ? `${prefix}${rnd}` : rnd;
+                currentCount++;
+                await set(ref(db, 'tables/' + code), {
+                    cafeId: uid,
+                    tableId: currentCount,
+                    game: GAMES[gameType],
+                    gameType,
+                    mode,
+                    state: 'waiting',
+                    createdAt: Date.now()
+                });
+                await set(ref(db, `cafeTables/${uid}/${code}`), true);
+            }
+
+            $('bulkTableModal').classList.add('hidden');
+            alert(`تم توليد ${count} طاولات جديدة بنجاح مع كلمات سر عشوائية فريدة! ✓`);
+        };
+
+        // طباعة مجمعة لكل بطاقات الطاولات
+        $('printAllCafeTablesBtn').onclick = () => {
+            const entries = Object.entries(liveTables);
+            if (!entries.length) return alert('لا توجد طاولات مفتوحة للطباعة حالياً.');
+            const cafe = currentCafe?.cafeName || 'الكافيه';
+            const w = window.open('', '_blank', 'width=800,height=900');
+            if (!w) return alert('يرجى السماح بالنوافذ المنبثقة للطباعة.');
+
+            const cards = entries.map(([tok, t]) => {
+                const link = `${location.origin}/games.html?code=${encodeURIComponent(tok)}`;
+                return `
+                <div style="border:2px dashed #333;border-radius:12px;padding:16px;margin:10px;text-align:center;width:220px;display:inline-block;vertical-align:top;page-break-inside:avoid">
+                    <h3 style="margin:0 0 4px;font-size:16px">${escapeHtml(cafe)}</h3>
+                    <div style="font-weight:bold;color:#444;font-size:12px">طاولة ${t.tableId || 1} • بوابة الألعاب 🎮</div>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(link)}" style="width:130px;height:130px;margin:8px 0" alt="QR">
+                    <div style="font-family:monospace;font-size:20px;font-weight:900;letter-spacing:3px;background:#f0f0f0;padding:4px;border-radius:6px;direction:ltr">${escapeHtml(tok)}</div>
+                    <small style="color:#666;font-size:10px;display:block;margin-top:4px">${t.mode === 'single' ? 'كلمة سر لمرة واحدة' : 'متعدد الاستخدام'}</small>
+                </div>`;
+            }).join('');
+
+            w.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>بطاقات طاولات ${escapeHtml(cafe)}</title><style>body{font-family:Tahoma,sans-serif;margin:20px;text-align:center}@media print{button{display:none}}</style></head><body><h2>بطاقات الدخول لطاولات ${escapeHtml(cafe)}</h2><button onclick="window.print()" style="padding:10px 20px;font-size:14px;font-weight:bold;cursor:pointer;margin-bottom:15px">🖨️ اضغط للطباعة الآن</button><div>${cards}</div></body></html>`);
+            w.document.close();
+        };
+
+        // ربط أزرار العمليات الإضافية
+        $('cafeBroadBtn').onclick = async () => {
+            const txt = ($('cafeBroadInp').value || '').trim();
+            if (!txt) return alert('اكتب نص الإشعار أولاً.');
+            await update(ref(db, 'settings/platform'), { announcement: txt, updatedAt: Date.now() });
+            logAct('بث إشعار للطاولات', txt);
+            alert('تم إرسال البث لجميع شاشات الطاولات بنجاح 📢');
+        };
+        $('cafeBroadClearBtn').onclick = async () => {
+            await update(ref(db, 'settings/platform'), { announcement: '', updatedAt: Date.now() });
+            $('cafeBroadInp').value = '';
+            alert('تم مسح البث المباشر ✓');
+        };
+
+        if ($('approveAllBtn')) $('approveAllBtn').onclick = approveAllPending;
+        if ($('addCafeBtn')) $('addCafeBtn').onclick = () => openCafeModal(null);
+        if ($('addCatBtn')) {
+            $('addCatBtn').onclick = async () => {
+                const name = ($('newCatName').value || '').trim();
+                if (!name) return showToast('اكتب اسم الفئة أولاً', 'warning');
+                const order = Object.values(allCats).length + 1;
+                await set(push(ref(db, 'gameData/categories')), { name, order, hidden: false, createdAt: Date.now(), questions: {} });
+                $('newCatName').value = '';
+                showToast('تمت إضافة الفئة بنجاح ✓', 'success');
+                logAct('إضافة فئة أسئلة', name);
+            };
+        }
+        if ($('exportCafesBtn')) $('exportCafesBtn').onclick = exportCafesCsv;
+        if ($('closeAllTablesBtn')) $('closeAllTablesBtn').onclick = closeAllTables;
+        if ($('exportGamesBtn')) $('exportGamesBtn').onclick = exportGamesCsv;
+        if ($('backupBtn')) $('backupBtn').onclick = backupAll;
+        if ($('cleanIdleBtn')) $('cleanIdleBtn').onclick = cleanIdleTables;
+        if ($('purgeRejectedBtn')) $('purgeRejectedBtn').onclick = purgeRejected;
+        if ($('saveSettingsBtn')) $('saveSettingsBtn').onclick = saveSettings;
+        if ($('exportBtn')) $('exportBtn').onclick = exportCats;
+        if ($('importFile')) $('importFile').onchange = e => { const f = e.target.files[0]; if (f) importCats(f); e.target.value = ''; };
+        if ($('qSearch')) $('qSearch').oninput = drawCats;
+        function switchTab(which) {
+            const P = { cafes: 'cafesPanel', tables: 'tablesPanel', questions: 'questionsPanel', settings: 'settingsPanel', games: 'gamesPanel' };
+            const T = { cafes: 'tabCafes', tables: 'tabTables', questions: 'tabQuestions', settings: 'tabSettings', games: 'tabGames' };
+            Object.keys(P).forEach(k => {
+                $(P[k]).classList.toggle('hidden', k !== which);
+                $(T[k]).className = 'tab-btn px-4 py-2 rounded-lg font-bold text-sm transition ' + (k === which ? 'bg-purple-600 text-white' : 'bg-slate-700 text-gray-300 hover:bg-slate-600');
+            });
+        }
+
+        $('tabCafes').onclick = () => switchTab('cafes');
+        $('tabTables').onclick = () => switchTab('tables');
+        $('tabQuestions').onclick = () => switchTab('questions');
+        $('tabSettings').onclick = () => switchTab('settings');
+        $('tabGames').onclick = () => switchTab('games');
+
+        $('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = $('loginUser').value.trim();
+            const pass = $('loginPass').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                $('loginError').textContent = err.message || 'خطأ في تسجيل الدخول';
+                $('loginError').classList.remove('hidden');
+            }
+        };
+
+        $('signupForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const cafeName = $('signupCafeName').value.trim();
+            const city = $('signupCity').value.trim();
+            const phone = $('signupPhone').value.trim();
+            const email = $('signupEmail').value.trim();
+            const pass = $('signupPass').value;
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                await set(ref(db, 'cafes/' + cred.user.uid), {
+                    cafeName, city, phone, ownerEmail: email, status: 'active', createdAt: Date.now(), maxTables: 10
+                });
+                showCafeDashboard();
+            } catch (err) {
+                $('signupError').textContent = err.message || 'خطأ في إنشاء الحساب';
+                $('signupError').classList.remove('hidden');
+            }
+        };
+
+        $('toSignupBtn').onclick = () => { $('loginForm').classList.add('hidden'); $('signupForm').classList.remove('hidden'); };
+        $('toLoginBtn').onclick = () => { $('signupForm').classList.add('hidden'); $('loginForm').classList.remove('hidden'); };
+        $('logoutBtn').onclick = () => signOut(auth);
+        $('adminLogoutBtn').onclick = () => signOut(auth);
+        $('waitingLogoutBtn').onclick = () => signOut(auth);
+        $('blockedLogoutBtn').onclick = () => signOut(auth);
+    </script>
+</body>
+</html>

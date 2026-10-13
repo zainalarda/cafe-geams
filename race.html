@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>سباق الأسئلة - تحدي السرعة</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Cairo',sans-serif;background-color:#0b0f19;color:white;margin:0;padding:0}
+.glass-panel{background:rgba(20,27,45,0.75);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.08)}
+.hidden{display:none !important}
+</style>
+</head>
+<body class="min-h-screen p-4 sm:p-6 flex flex-col items-center justify-center">
+    <div class="w-full max-w-xl space-y-5">
+        <header class="text-center space-y-2">
+            <div class="flex items-center justify-between">
+                <a id="backGamesLink" href="/games.html" class="inline-flex items-center gap-1.5 text-xs text-amber-300 bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-xl font-bold transition border border-slate-700">
+                    <i class="fas fa-gamepad"></i> بوابة الألعاب
+                </a>
+                <span class="text-xs text-gray-500 font-mono">طاولة الكافيه</span>
+            </div>
+            <h1 class="text-3xl font-black text-amber-400">⚡ سباق الأسئلة السريع</h1>
+            <p class="text-gray-400 text-sm">جاوب أسرع، اجمع نقاطاً أكثر، وتصدر لوحة الشرف!</p>
+            <div id="tableBadge" class="hidden text-xs bg-slate-800 text-amber-300 font-bold px-3 py-1 rounded-full inline-block border border-slate-700"></div>
+        </header>
+
+        <!-- بطاقة التحقق من كلمة سر الطاولة -->
+        <div id="authCard" class="glass-panel p-6 rounded-2xl border-2 border-amber-500/40 text-center space-y-4 shadow-xl">
+            <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-xl font-bold">
+                🔒
+            </div>
+            <h2 class="text-xl font-bold text-white">كلمة سر الطاولة مطلوبة</h2>
+            <p class="text-xs text-gray-400">أدخل كلمة سر الطاولة المعتمدة لسباق الأسئلة</p>
+            <div class="max-w-xs mx-auto">
+                <input id="raceCodeInp" type="text" dir="ltr" maxlength="12" placeholder="كلمة السر" class="w-full bg-slate-800 border border-slate-600 focus:border-amber-400 rounded-xl px-4 py-2.5 text-white font-mono uppercase text-center font-bold tracking-widest text-base focus:outline-none">
+            </div>
+            <div id="authErr" class="text-xs text-red-400 hidden bg-red-950/50 p-2.5 rounded-xl border border-red-800 font-bold"></div>
+            <button id="authBtn" class="w-full max-w-xs mx-auto bg-amber-600 hover:bg-amber-500 text-slate-950 font-black py-2.5 rounded-xl text-sm transition">
+                تأكيد وبدء السباق 🚀
+            </button>
+        </div>
+
+        <!-- لوحة السؤال والمؤقت -->
+        <div id="gameCard" class="glass-panel p-6 rounded-2xl border border-slate-700 space-y-5 shadow-xl hidden">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-700/60 text-sm font-bold">
+                <span class="text-gray-400">سؤال <b id="qIndex" class="text-white">1</b> من 8</span>
+                <span class="text-yellow-400 font-mono text-lg font-black" id="raceTimer">⏱ 12</span>
+                <span class="text-emerald-400">النقاط: <b id="raceScore" class="font-mono">0</b></span>
+            </div>
+
+            <h2 id="questionText" class="text-xl sm:text-2xl font-black text-center py-4 text-white leading-relaxed">
+                جارٍ تجهيز السؤال…
+            </h2>
+
+            <div id="optionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+        </div>
+
+        <!-- شاشة نهاية السباق -->
+        <div id="endCard" class="glass-panel p-6 rounded-2xl border border-slate-700 text-center space-y-4 shadow-xl hidden">
+            <div class="text-5xl">🏆</div>
+            <h2 class="text-2xl font-black text-yellow-400">انتهى سباق الأسئلة!</h2>
+            <p class="text-base font-bold text-gray-300">مجموع نقاطك النهائي: <span id="finalScore" class="text-emerald-400 font-black text-2xl font-mono">0</span></p>
+            <div id="prizeContainer"></div>
+            <div class="flex gap-2 justify-center pt-2">
+                <button onclick="location.reload()" class="bg-amber-600 hover:bg-amber-500 px-5 py-2.5 rounded-xl font-bold text-sm text-slate-950 shadow-lg">
+                    سباق جديد
+                </button>
+                <a id="resBackLink" href="/games.html" class="bg-emerald-600 hover:bg-emerald-500 px-5 py-2.5 rounded-xl font-bold text-sm text-white">
+                    بوابة الألعاب 🎮
+                </a>
+                <a href="/leaderboard.html" class="bg-slate-700 hover:bg-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm inline-flex items-center gap-1.5 text-white">
+                    <i class="fas fa-trophy"></i> المتصدرون
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { openTable, recordResult, prizeHtml, GAMES } from './core.js';
+
+        const QUESTIONS = [
+            { q: "ما هو أكبر كواكب المجموعة الشمسية حجماً؟", a: "المشتري", opts: ["المشتري", "زحل", "الأرض", "نبتون"] },
+            { q: "في أي قارة تقع أهرامات الجيزة؟", a: "أفريقيا", opts: ["أفريقيا", "آسيا", "أوروبا", "أمريكا"] },
+            { q: "كم عدد أضلاع الشكل السداسي المنتظم؟", a: "6", opts: ["5", "6", "7", "8"] },
+            { q: "ما هو الغاز الضروري لتنفس الكائنات الحية الأرضية؟", a: "الأكسجين", opts: ["الأكسجين", "النيتروجين", "الهيليوم", "ثاني أكسيد الكربون"] },
+            { q: "ما هي عاصمة اليابان؟", a: "طوكيو", opts: ["طوكيو", "كيوتو", "أوساكا", "سيول"] },
+            { q: "ما هو أسرع حيوان بري على وجه الأرض؟", a: "الفهد", opts: ["الفهد", "الأسد", "الغزال", "الحصان"] },
+            { q: "ما هو المعدن الذي يكون في الحالة السائلة في درجة حرارة الغرفة؟", a: "الزئبق", opts: ["الزئبق", "الحديد", "الألمنيوم", "النحاس"] },
+            { q: "كم عدد ألوان قوس قزح الرئيسية؟", a: "7", opts: ["5", "6", "7", "8"] }
+        ];
+
+        let idx = 0;
+        let score = 0;
+        let timer = null;
+        let timeLeft = 12;
+        let tableData = null;
+
+        const P = new URLSearchParams(location.search);
+        const urlCode = P.get('code');
+        if (urlCode) {
+            document.getElementById('raceCodeInp').value = urlCode;
+            tryOpen(urlCode);
+        }
+
+        async function tryOpen(code) {
+            const errEl = document.getElementById('authErr');
+            errEl.classList.add('hidden');
+            const res = await openTable(code, 'race');
+            if (res.error) {
+                errEl.textContent = res.error;
+                errEl.classList.remove('hidden');
+                return;
+            }
+            tableData = res.data;
+            const link = `/games.html?code=${encodeURIComponent(code)}`;
+            const bLink = document.getElementById('backGamesLink');
+            if (bLink) bLink.href = link;
+            const rLink = document.getElementById('resBackLink');
+            if (rLink) rLink.href = link;
+            document.getElementById('authCard').classList.add('hidden');
+            document.getElementById('gameCard').classList.remove('hidden');
+            const b = document.getElementById('tableBadge');
+            b.textContent = `طاولة ${tableData.tableId || 1} • متصل ✓`;
+            b.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        document.getElementById('authBtn').onclick = () => {
+            const code = document.getElementById('raceCodeInp').value.trim();
+            if (!code) {
+                document.getElementById('authErr').textContent = 'يرجى كتابة كلمة السر أولاً.';
+                document.getElementById('authErr').classList.remove('hidden');
+                return;
+            }
+            tryOpen(code);
+        };
+
+        function loadQuestion() {
+            if (idx >= QUESTIONS.length) {
+                finishRace();
+                return;
+            }
+
+            const curr = QUESTIONS[idx];
+            document.getElementById('qIndex').textContent = idx + 1;
+            document.getElementById('questionText').textContent = curr.q;
+
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+
+            const shuffled = [...curr.opts].sort(() => Math.random() - 0.5);
+            shuffled.forEach(opt => {
+                const b = document.createElement('button');
+                b.className = 'bg-slate-800 hover:bg-slate-700 border border-slate-600 p-3.5 rounded-xl font-bold text-sm text-white transition active:scale-95';
+                b.textContent = opt;
+                b.onclick = () => choose(opt, curr.a, b);
+                grid.appendChild(b);
+            });
+
+            timeLeft = 12;
+            document.getElementById('raceTimer').textContent = `⏱ ${timeLeft}`;
+            clearInterval(timer);
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('raceTimer').textContent = `⏱ ${timeLeft}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    idx++;
+                    loadQuestion();
+                }
+            }, 1000);
+        }
+
+        function choose(selected, correct, btn) {
+            clearInterval(timer);
+            const isCorrect = selected === correct;
+            if (isCorrect) {
+                btn.className = 'bg-emerald-600 border border-emerald-400 p-3.5 rounded-xl font-bold text-sm text-white shadow-lg';
+                score += (timeLeft * 10) + 50;
+                document.getElementById('raceScore').textContent = score;
+            } else {
+                btn.className = 'bg-red-600 border border-red-400 p-3.5 rounded-xl font-bold text-sm text-white shadow-lg';
+            }
+
+            setTimeout(() => {
+                idx++;
+                loadQuestion();
+            }, 700);
+        }
+
+        async function finishRace() {
+            clearInterval(timer);
+            document.getElementById('gameCard').classList.add('hidden');
+            document.getElementById('endCard').classList.remove('hidden');
+            document.getElementById('finalScore').textContent = score;
+
+            if (tableData && tableData.cafeId) {
+                const p = await recordResult({
+                    cafeId: tableData.cafeId,
+                    game: GAMES.race,
+                    name: 'لاعب طاولة ' + (tableData.tableId || 1),
+                    score,
+                    win: score >= 400
+                });
+                if (p) document.getElementById('prizeContainer').innerHTML = prizeHtml(p, tableData.cafeId);
+            }
+        }
+    </script>
+</body>
+</html>

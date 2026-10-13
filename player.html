@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>العبها صح - تحدي الفرق على الطاولة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+:root{
+  --bg0:#070a14;--bg1:#0f1629;--surface:#151d33;--surface2:#1c2744;
+  --line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.18);
+  --gold:#ffc53d;--gold2:#ff9500;
+  --t1:#25e0c0;--t1d:#0f9c86;
+  --t2:#ff4d6d;--t2d:#c22345;
+  --ok:#20c997;--bad:#ff4d6d;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Cairo',sans-serif;color:#f3f5fc;background-color:var(--bg0);margin:0;min-height:100vh;
+  background-image:radial-gradient(900px 500px at 85% -10%,rgba(255,197,61,.08) 0,transparent 55%),
+    radial-gradient(850px 480px at -5% 105%,rgba(255,77,109,.08) 0,transparent 50%),
+    linear-gradient(180deg,var(--bg1) 0%,var(--bg0) 100%);
+  background-attachment:fixed;
+}
+.glass{background:rgba(21,29,51,0.85);backdrop-filter:blur(14px);border:1px solid var(--line)}
+.cell{
+  aspect-ratio:1/1;border-radius:14px;font-weight:900;font-size:clamp(16px,4vw,26px);
+  display:grid;place-items:center;border:2px solid var(--line);background:linear-gradient(180deg,var(--surface2),var(--bg0));
+  color:var(--gold);cursor:pointer;transition:all .14s cubic-bezier(0.16,1,0.3,1);box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+.cell:hover:not(.used):not(.empty){transform:translateY(-3px) scale(1.03);filter:brightness(1.18);border-color:var(--gold)}
+.cell:active:not(.used):not(.empty){transform:translateY(1px)}
+.cell.t1{border-color:rgba(37,224,192,.45)}
+.cell.t2{border-color:rgba(255,77,109,.45)}
+.cell.used{background:rgba(10,14,26,.85);color:#5c678a;border-color:var(--line);cursor:default;opacity:.42;box-shadow:none}
+.cell.empty{opacity:.2;cursor:not-allowed;color:#5c678a}
+.pick-item{transition:all .12s}
+.pick-item.t1.on{border-color:var(--t1);background:rgba(37,224,192,.16)}
+.pick-item.t2.on{border-color:var(--t2);background:rgba(255,77,109,.16)}
+.pick-item.taken{opacity:.35;cursor:not-allowed}
+.ov{position:fixed;inset:0;background:rgba(3,5,10,.94);z-index:90;display:none;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.ov.show{display:flex}
+.hidden{display:none !important}
+#confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:100}
+</style>
+</head>
+<body class="p-3 sm:p-5 flex flex-col items-center">
+<canvas id="confettiCanvas"></canvas>
+
+<div class="w-full max-w-4xl space-y-4">
+    <!-- الشريط العلوي الذكي للطاولة -->
+    <header class="glass p-3.5 sm:p-4 rounded-2xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-950 flex items-center justify-center font-black text-xl shadow-md">
+                🎮
+            </div>
+            <div>
+                <h1 class="text-base sm:text-lg font-black text-white flex items-center gap-2">
+                    العبها صح <span class="text-xs bg-slate-800 text-cyan-300 px-2.5 py-0.5 rounded-full font-bold border border-slate-700" id="tableHeaderBadge">🔒 بانتظار كلمة السر</span>
+                </h1>
+                <p class="text-xs text-gray-400 font-medium" id="cafeHeaderInfo">المقهى: —</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button id="fsToggle" class="glass px-3 py-1.5 rounded-xl text-xs font-bold text-gray-300 hover:text-white transition flex items-center gap-1.5" title="ملء الشاشة">
+                <i class="fas fa-expand"></i> <span class="hidden sm:inline">شاشة كاملة</span>
+            </button>
+            <button id="soundToggle" class="glass px-3 py-1.5 rounded-xl text-xs font-bold text-gray-300 hover:text-white transition flex items-center gap-1.5">
+                <span id="sndIcon">🔊</span> <span class="hidden sm:inline">الصوت</span>
+            </button>
+            <div class="relative group">
+                <button class="bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold text-cyan-300 border border-slate-700 flex items-center gap-1.5">
+                    <i class="fas fa-bars"></i> الألعاب
+                </button>
+                <div class="absolute left-0 mt-1.5 w-44 glass rounded-xl shadow-2xl p-1.5 hidden group-hover:block z-50 border border-slate-700 text-xs">
+                    <a href="/mafia.html" class="block p-2 rounded-lg hover:bg-slate-800 font-bold text-red-400"><i class="fas fa-mask ml-1.5"></i>لعبة المافيا</a>
+                    <a href="/htns.html" class="block p-2 rounded-lg hover:bg-slate-800 font-bold text-emerald-400"><i class="fas fa-leaf ml-1.5"></i>إنسان حيوان نبات</a>
+                    <a href="/race.html" class="block p-2 rounded-lg hover:bg-slate-800 font-bold text-amber-400"><i class="fas fa-bolt ml-1.5"></i>سباق الأسئلة</a>
+                    <a href="/leaderboard.html" class="block p-2 rounded-lg hover:bg-slate-800 font-bold text-yellow-300"><i class="fas fa-trophy ml-1.5"></i>لوحة المتصدرين</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- شاشة البداية والتحقق الإلزامي من كلمة السر -->
+    <section id="stepJoin" class="glass p-6 sm:p-8 rounded-3xl space-y-6 shadow-2xl">
+        <div class="text-center space-y-2">
+            <div class="inline-block bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-yellow-500/30 text-yellow-300 text-xs px-3.5 py-1.5 rounded-full font-bold">
+                🔒 دخول محمي: لا يمكن الدخول إلا بكلمة سر معتمدة من الكافيه
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-white">تحدي الطاولة بين فريقين</h2>
+            <p class="text-sm text-gray-400 max-w-lg mx-auto">أدخل كلمة سر الطاولة المطبوعة على البطاقة أو الممنوحة من الكاشير لتفعيل اللوحة</p>
+        </div>
+
+        <div class="bg-slate-900/70 p-5 rounded-2xl border-2 border-amber-500/40 space-y-3">
+            <label class="block text-sm font-black text-amber-300 text-center">
+                <i class="fas fa-key ml-1.5"></i> كلمة سر الطاولة / رمز الدخول (إلزامي)
+            </label>
+            <div class="flex max-w-sm mx-auto">
+                <input id="codeInp" type="text" dir="ltr" maxlength="12" placeholder="اكتب كلمة السر هنا" class="w-full bg-slate-800 border-2 border-slate-600 focus:border-amber-400 rounded-xl px-4 py-3 text-white font-mono uppercase tracking-widest text-center focus:outline-none font-black text-lg">
+            </div>
+            <p id="joinMsg" class="text-xs text-center text-gray-400">تأكد من كتابة الرمز بدقة كما استلمته من الكافيه.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- الفريق الأول -->
+            <div class="bg-slate-900/60 p-4 rounded-2xl border border-teal-500/30 space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-bold text-teal-300 flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-teal-400"></span> الفريق الأول (يمين اللوحة)
+                    </label>
+                    <span class="text-xs text-teal-400/80 font-bold">اللون الزمردي</span>
+                </div>
+                <input id="team1Input" type="text" value="فريق الصقور" maxlength="18" class="w-full bg-slate-800 border border-slate-700 focus:border-teal-400 rounded-xl px-4 py-2.5 text-white font-bold text-center focus:outline-none text-base">
+                <div class="flex flex-wrap gap-1.5 text-xs">
+                    <span class="text-gray-500 text-xs self-center ml-1">اقتراحات:</span>
+                    <button type="button" onclick="setT1('الصقور 🦅')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-gray-300">الصقور 🦅</button>
+                    <button type="button" onclick="setT1('الفرسان ⚔️')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-gray-300">الفرسان ⚔️</button>
+                    <button type="button" onclick="setT1('النشامى 🦁')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-gray-300">النشامى 🦁</button>
+                </div>
+            </div>
+
+            <!-- الفريق الثاني -->
+            <div class="bg-slate-900/60 p-4 rounded-2xl border border-pink-500/30 space-y-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-sm font-bold text-pink-300 flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-pink-400"></span> الفريق الثاني (يسار اللوحة)
+                    </label>
+                    <span class="text-xs text-pink-400/80 font-bold">اللون القرمزي</span>
+                </div>
+                <input id="team2Input" type="text" value="فريق النجوم" maxlength="18" class="w-full bg-slate-800 border border-slate-700 focus:border-pink-400 rounded-xl px-4 py-2.5 text-white font-bold text-center focus:outline-none text-base">
+                <div class="flex flex-wrap gap-1.5 text-xs">
+                    <span class="text-gray-500 text-xs self-center ml-1">اقتراحات:</span>
+                    <button type="button" onclick="setT2('النجوم ⭐')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-gray-300">النجوم ⭐</button>
+                    <button type="button" onclick="setT2('الذئاب 🐺')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-gray-300">الذئاب 🐺</button>
+                    <button type="button" onclick="setT2('العباقرة 💡')" class="bg-slate-800 hover:bg-slate-700 px-2.5 py-1 rounded-lg text-gray-300">العباقرة 💡</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="joinErr" class="text-red-300 text-sm hidden text-center bg-red-950/70 p-3 rounded-xl border border-red-800 font-bold"></div>
+
+        <button id="startSetupBtn" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-lg py-4 rounded-2xl shadow-xl shadow-amber-500/20 transition transform active:scale-[0.99] flex items-center justify-center gap-2">
+            <i class="fas fa-unlock-alt"></i> التحقق من كلمة السر وبدء اللعبة 🎯
+        </button>
+    </section>
+
+    <!-- شاشة اختيار الفئات -->
+    <section id="stepPicks" class="glass p-5 sm:p-7 rounded-3xl space-y-5 shadow-2xl hidden">
+        <div class="text-center space-y-1">
+            <h2 class="text-2xl font-black text-white">اختيار فئات التحدي</h2>
+            <p class="text-xs sm:text-sm text-gray-400">كل فريق يختار <span id="pickReqNum">3</span> فئات. الفئة التي يختارها فريق تُحجب عن المنافس!</p>
+        </div>
+
+        <div id="turnPickBanner" class="p-3 rounded-xl text-center font-bold text-sm bg-teal-500/20 text-teal-300 border border-teal-500/40 animate-pulse">
+            🎯 دور الفريق الأول لاختيار الفئات الآن
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-slate-900/60 p-4 rounded-2xl border-t-4 border-teal-400 space-y-3">
+                <h3 id="p1Title" class="font-bold text-teal-300 text-center text-sm">الفريق الأول (0/3)</h3>
+                <div id="pList1" class="space-y-2"></div>
+            </div>
+            <div class="bg-slate-900/60 p-4 rounded-2xl border-t-4 border-pink-400 space-y-3">
+                <h3 id="p2Title" class="font-bold text-pink-300 text-center text-sm">الفريق الثاني (0/3)</h3>
+                <div id="pList2" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <button id="launchBoardBtn" disabled class="w-full bg-gradient-to-r from-teal-400 to-emerald-500 disabled:opacity-40 text-slate-950 font-black text-lg py-3.5 rounded-2xl shadow-xl transition">
+            ابدأ لوحة الأسئلة الآن 🚀
+        </button>
+    </section>
+
+    <!-- شاشة لوحة اللعب الرئيسية -->
+    <section id="stepBoard" class="space-y-4 hidden">
+        <!-- لوحة النتيجة وشريط الأدوار -->
+        <div class="glass p-4 rounded-2xl flex justify-between items-center shadow-lg border border-slate-700">
+            <div class="text-right">
+                <span class="text-xs text-teal-400 block font-bold" id="boardT1Name">الفريق الأول</span>
+                <span class="text-2xl sm:text-3xl font-black text-teal-300 font-mono" id="score1">0</span>
+            </div>
+            <div class="text-center px-4">
+                <span class="text-xs text-gray-400 font-bold block" id="currentTurnBadge">🎯 دور اختيار السؤال:</span>
+                <span class="text-xs sm:text-sm font-black text-amber-300 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 mt-1 inline-block" id="activeTeamTurn">فريق الصقور</span>
+            </div>
+            <div class="text-left">
+                <span class="text-xs text-pink-400 block font-bold" id="boardT2Name">الفريق الثاني</span>
+                <span class="text-2xl sm:text-3xl font-black text-pink-300 font-mono" id="score2">0</span>
+            </div>
+        </div>
+
+        <!-- شريط وسائل المساعدة لكل فريق -->
+        <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="glass p-2.5 rounded-xl border border-teal-500/30 flex flex-wrap items-center justify-between gap-1">
+                <span class="font-bold text-teal-300">مساعدات <span id="hlT1Name">الفريق 1</span>:</span>
+                <div class="flex gap-1" id="t1PowerIcons">
+                    <button id="btn5050_1" class="px-2 py-0.5 rounded bg-slate-800 text-teal-300 border border-slate-700 hover:bg-slate-700 font-bold" title="حذف خيارين / تلميح">✂️ 50:50</button>
+                    <button id="btnTime_1" class="px-2 py-0.5 rounded bg-slate-800 text-teal-300 border border-slate-700 hover:bg-slate-700 font-bold" title="+15 ثانية">⏳ +15ث</button>
+                    <button id="btnDbl_1" class="px-2 py-0.5 rounded bg-slate-800 text-teal-300 border border-slate-700 hover:bg-slate-700 font-bold" title="مضاعفة النقاط">💥 2X</button>
+                </div>
+            </div>
+            <div class="glass p-2.5 rounded-xl border border-pink-500/30 flex flex-wrap items-center justify-between gap-1">
+                <span class="font-bold text-pink-300">مساعدات <span id="hlT2Name">الفريق 2</span>:</span>
+                <div class="flex gap-1" id="t2PowerIcons">
+                    <button id="btn5050_2" class="px-2 py-0.5 rounded bg-slate-800 text-pink-300 border border-slate-700 hover:bg-slate-700 font-bold" title="حذف خيارين / تلميح">✂️ 50:50</button>
+                    <button id="btnTime_2" class="px-2 py-0.5 rounded bg-slate-800 text-pink-300 border border-slate-700 hover:bg-slate-700 font-bold" title="+15 ثانية">⏳ +15ث</button>
+                    <button id="btnDbl_2" class="px-2 py-0.5 rounded bg-slate-800 text-pink-300 border border-slate-700 hover:bg-slate-700 font-bold" title="مضاعفة النقاط">💥 2X</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- رؤوس الأعمدة للوحة -->
+        <div class="grid grid-cols-[1fr_minmax(100px,0.5fr)_1fr] gap-3 text-center text-xs sm:text-sm font-black px-2">
+            <span class="text-teal-300" id="colHeader1">الصقور (يمين)</span>
+            <span class="text-gray-400">الفئات التنافسية</span>
+            <span class="text-pink-300" id="colHeader2">النجوم (يسار)</span>
+        </div>
+
+        <!-- أسطر اللوحة -->
+        <div id="boardContainer" class="space-y-3"></div>
+
+        <!-- بطاقة النهاية والتتويج -->
+        <div id="victoryCard" class="glass p-6 rounded-3xl text-center space-y-4 shadow-2xl border-2 border-yellow-500/40 hidden">
+            <div class="text-5xl animate-bounce">🏆</div>
+            <h2 class="text-2xl sm:text-3xl font-black text-yellow-300" id="victoryTitle">مبروك للفائز!</h2>
+            <p class="text-sm font-bold text-gray-300" id="victorySubtitle"></p>
+            <div id="prizeVoucher" class="max-w-md mx-auto"></div>
+            <div class="flex flex-wrap gap-2 justify-center pt-2">
+                <button onclick="playAgain()" class="bg-amber-600 hover:bg-amber-500 px-6 py-2.5 rounded-xl font-bold text-sm text-slate-950 shadow-lg">
+                    🔄 جولة جديدة بنفس الفرق
+                </button>
+                <button onclick="location.reload()" class="bg-slate-700 hover:bg-slate-600 px-6 py-2.5 rounded-xl font-bold text-sm text-white">
+                    تغيير الفرق والطاولة
+                </button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- نافذة عرض السؤال التفاعلية -->
+<div id="qModal" class="ov">
+    <div class="glass w-full max-w-2xl rounded-3xl border border-slate-600 shadow-2xl p-6 space-y-5 animate-scale">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-700/80">
+            <span id="modalCategory" class="text-xs sm:text-sm font-bold text-cyan-300 bg-slate-800 px-3 py-1 rounded-full">فئة: عامة</span>
+            <span id="modalTimer" class="text-2xl font-black font-mono text-yellow-400">⏱ 30</span>
+            <div class="flex items-center gap-1.5">
+                <span id="doubleBadge" class="hidden text-xs font-black text-amber-300 bg-amber-500/20 px-2.5 py-1 rounded-full border border-amber-500/40 animate-pulse">💥 2X نقاط</span>
+                <span id="modalPoints" class="text-xs sm:text-sm font-black text-amber-300 bg-amber-500/20 px-3 py-1 rounded-full border border-amber-500/30">400 نقطة</span>
+            </div>
+        </div>
+
+        <div id="mediaBox" class="rounded-2xl overflow-hidden max-h-64 flex justify-center hidden"></div>
+
+        <h2 id="modalQuestionText" class="text-xl sm:text-2xl font-black text-center text-white leading-relaxed py-4">
+            نص السؤال يظهر هنا…
+        </h2>
+
+        <!-- منطقة التلميح أو وسيلة 50:50 -->
+        <div id="lifelineHintBox" class="hidden bg-cyan-950/40 p-3 rounded-xl border border-cyan-800/60 text-center text-xs text-cyan-300 font-bold"></div>
+
+        <div id="answerRevealBox" class="hidden text-center bg-gradient-to-r from-emerald-600/30 to-teal-600/20 p-4 rounded-2xl border border-emerald-500/40 space-y-2">
+            <span class="text-xs text-emerald-300 font-bold block">✓ الإجابة الصحيحة:</span>
+            <div id="modalAnswerText" class="text-xl sm:text-2xl font-black text-emerald-300"></div>
+            <p id="modalExplanation" class="text-xs text-gray-300 pt-1 border-t border-slate-700/60 hidden"></p>
+        </div>
+
+        <div id="actionButtons" class="space-y-2 pt-2">
+            <button id="revealBtn" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black py-3 rounded-xl text-base shadow-lg transition">
+                👁️ إظهار الإجابة الصحيحة
+            </button>
+
+            <!-- زر خطف السؤال للمنافس عند التعثر -->
+            <div id="stealBox" class="hidden text-center pb-2">
+                <button id="stealBtn" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black py-2.5 rounded-xl text-sm shadow-md transition">
+                    ⚡ خطف السؤال لـ <span id="stealTeamName">الفريق المنافس</span> (نصف النقاط!)
+                </button>
+            </div>
+
+            <div id="awardButtons" class="grid grid-cols-1 sm:grid-cols-3 gap-2 hidden">
+                <button id="awardT1Btn" class="bg-teal-600 hover:bg-teal-500 py-3 rounded-xl font-bold text-xs sm:text-sm text-white shadow-lg transition">
+                    صحيحة لـ الفريق 1
+                </button>
+                <button id="awardT2Btn" class="bg-pink-600 hover:bg-pink-500 py-3 rounded-xl font-bold text-xs sm:text-sm text-white shadow-lg transition">
+                    صحيحة لـ الفريق 2
+                </button>
+                <button id="awardNoneBtn" class="bg-slate-700 hover:bg-slate-600 py-3 rounded-xl font-bold text-xs sm:text-sm text-gray-300 transition">
+                    خسارة الخانة (لا أحد)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { db, auth, ref, get, set, update, push, onValue, signInAnonymously } from './firebase-init.js';
+import { recordResult, prizeHtml, GAMES } from './core.js';
+
+window.setT1 = s => { document.getElementById('team1Input').value = s; };
+window.setT2 = s => { document.getElementById('team2Input').value = s; };
+
+// حالة اللعبة
+let currentTable = null;
+let currentCafeId = null;
+let currentTableNo = 1;
+let team1 = 'فريق الصقور';
+let team2 = 'فريق النجوم';
+let score1 = 0;
+let score2 = 0;
+let activeTurn = 1;
+let multiplier = 1;
+
+// وسائل المساعدة (مرة واحدة لكل فريق في المباراة)
+const powerUps = {
+    1: { fifty: true, time: true, dbl: true },
+    2: { fifty: true, time: true, dbl: true }
+};
+
+let cats = [];
+let team1Cats = [];
+let team2Cats = [];
+let picksNeeded = 3;
+
+const usedCells = new Set();
+const usedQuestions = new Set();
+let currentCell = null;
+let timer = null;
+let timeLeft = 30;
+let soundEnabled = true;
+
+// فحص معلمات الرابط إن وجدت
+const params = new URLSearchParams(location.search);
+if (params.get('code')) {
+    document.getElementById('codeInp').value = params.get('code');
+}
+
+// الصوتيات (Web Audio API Synthesizer دون أي ملفات خارجية)
+let audioCtx = null;
+function getAudioContext() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+}
+
+function playBeep(freq = 440, type = 'sine', duration = 0.12, vol = 0.1) {
+    if (!soundEnabled) return;
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+    } catch(e) {}
+}
+
+function playWinSound() {
+    if (!soundEnabled) return;
+    [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
+        setTimeout(() => playBeep(f, 'triangle', 0.35, 0.2), i * 140);
+    });
+}
+
+function playFanfare() {
+    if (!soundEnabled) return;
+    [440, 554, 659, 880].forEach((f, i) => {
+        setTimeout(() => playBeep(f, 'sine', 0.2, 0.15), i * 90);
+    });
+}
+
+document.getElementById('soundToggle').onclick = () => {
+    soundEnabled = !soundEnabled;
+    document.getElementById('sndIcon').textContent = soundEnabled ? '🔊' : '🔇';
+};
+
+document.getElementById('fsToggle').onclick = () => {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+        document.exitFullscreen().catch(() => {});
+    }
+};
+
+// تحميل الفئات من قاعدة البيانات
+async function loadCategories() {
+    try {
+        const snap = await get(ref(db, 'gameData/categories'));
+        const list = [];
+        if (snap.exists()) {
+            snap.forEach(ch => {
+                const c = ch.val() || {};
+                if (c.hidden) return;
+                const qsObj = c.questions || {};
+                const qs = Object.keys(qsObj).map(k => ({ key: k, ...qsObj[k] }));
+                list.push({ id: ch.key, name: c.name, questions: qs, order: c.order || 0 });
+            });
+        }
+        list.sort((a, b) => a.order - b.order);
+        cats = list;
+    } catch(e) {
+        cats = [];
+    }
+
+    if (!cats || cats.length === 0) {
+        cats = [
+            {
+                id: 'cat1', name: 'ثقافة عامة', order: 1,
+                questions: [
+                    { key: 'q1', q: 'ما هي عاصمة أستراليا؟', a: 'كانبرا', difficulty: 'easy', points: 200, timeLimit: 25 },
+                    { key: 'q2', q: 'كم عدد قارات العالم؟', a: '7 قارات', difficulty: 'easy', points: 200, timeLimit: 20 },
+                    { key: 'q3', q: 'ما هو العنصر الأكثر وفرة بقشرة الأرض؟', a: 'الأكسجين', difficulty: 'medium', points: 400, timeLimit: 30 },
+                    { key: 'q4', q: 'في أي عام سقط جدار برلين؟', a: '1989', difficulty: 'medium', points: 400, timeLimit: 30 },
+                    { key: 'q5', q: 'ما هو أعمق خندق مائي في العالم؟', a: 'خندق ماريانا', difficulty: 'hard', points: 600, timeLimit: 35 },
+                    { key: 'q6', q: 'صاحب كتاب «الجمهورية» الفلسفي؟', a: 'أفلاطون', difficulty: 'hard', points: 600, timeLimit: 35 }
+                ]
+            },
+            {
+                id: 'cat2', name: 'علوم وتكنولوجيا', order: 2,
+                questions: [
+                    { key: 'q7', q: 'الكوكب الأقرب للشمس؟', a: 'عطارد', difficulty: 'easy', points: 200, timeLimit: 20 },
+                    { key: 'q8', q: 'وحدة قياس شدة التيار الكهربائي؟', a: 'الأمبير', difficulty: 'easy', points: 200, timeLimit: 20 },
+                    { key: 'q9', q: 'مطور نظام التشغيل لينكس؟', a: 'لينوس تورفالدس', difficulty: 'medium', points: 400, timeLimit: 30 },
+                    { key: 'q10', q: 'كم بت في البايت الواحد؟', a: '8 بت', difficulty: 'medium', points: 400, timeLimit: 25 },
+                    { key: 'q11', q: 'الجسيمات المسؤولة عن ربط الكواركات؟', a: 'الغلوونات', difficulty: 'hard', points: 600, timeLimit: 35 },
+                    { key: 'q12', q: 'أول لغة برمجة عالية المستوى عام 1957؟', a: 'فورتران', difficulty: 'hard', points: 600, timeLimit: 35 }
+                ]
+            },
+            {
+                id: 'cat3', name: 'تاريخ وجغرافيا', order: 3,
+                questions: [
+                    { key: 'q13', q: 'أطول سلسلة جبلية برية؟', a: 'جبال الأنديز', difficulty: 'easy', points: 200, timeLimit: 25 },
+                    { key: 'q14', q: 'أين تقع أهرامات الجيزة؟', a: 'مصر', difficulty: 'easy', points: 200, timeLimit: 20 },
+                    { key: 'q15', q: 'عاصمة الإمبراطورية البيزنطية قبل 1453؟', a: 'القسطنطينية', difficulty: 'medium', points: 400, timeLimit: 30 },
+                    { key: 'q16', q: 'أكبر بحيرة مغلقة في العالم؟', a: 'بحر قزوين', difficulty: 'medium', points: 400, timeLimit: 30 },
+                    { key: 'q17', q: 'معركة هزيمة نابليون بونابرت الأخيرة؟', a: 'معركة واترلو', difficulty: 'hard', points: 600, timeLimit: 35 },
+                    { key: 'q18', q: 'أقدم عاصمة مأهولة بالسكان باستمرار؟', a: 'دمشق', difficulty: 'hard', points: 600, timeLimit: 35 }
+                ]
+            },
+            {
+                id: 'cat4', name: 'رياضة وتحدي', order: 4,
+                questions: [
+                    { key: 'q19', q: 'كم عدد لاعبي فريق كرة القدم بالملعب؟', a: '11 لاعباً', difficulty: 'easy', points: 200, timeLimit: 20 },
+                    { key: 'q20', q: 'الفائز بأول كأس عالم 1930؟', a: 'الأوروغواي', difficulty: 'easy', points: 200, timeLimit: 25 },
+                    { key: 'q21', q: 'طول سباق الماراثون بالكيلومتر؟', a: '42.195 كم', difficulty: 'medium', points: 400, timeLimit: 30 },
+                    { key: 'q22', q: 'بطل يورو 2004 المفاجئ؟', a: 'اليونان', difficulty: 'medium', points: 400, timeLimit: 30 },
+                    { key: 'q23', q: 'ارتفاع حلقة كرة السلة عن الأرض؟', a: '3.05 متر', difficulty: 'hard', points: 600, timeLimit: 35 },
+                    { key: 'q24', q: 'صاحب الرقم القياسي بسباق 100م بـ 9.58 ثانية؟', a: 'يوسين بولت', difficulty: 'hard', points: 600, timeLimit: 35 }
+                ]
+            }
+        ];
+    }
+}
+
+// بدء الإعداد والتحقق الصارم من كلمة السر
+document.getElementById('startSetupBtn').onclick = async () => {
+    const code = document.getElementById('codeInp').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+    team1 = document.getElementById('team1Input').value.trim() || 'الفريق الأول';
+    team2 = document.getElementById('team2Input').value.trim() || 'الفريق الثاني';
+
+    document.getElementById('joinErr').classList.add('hidden');
+
+    if (!code) {
+        document.getElementById('joinErr').textContent = '❌ يرجى كتابة كلمة سر الطاولة السريّة للدخول.';
+        document.getElementById('joinErr').classList.remove('hidden');
+        playBeep(180, 'sawtooth', 0.2);
+        return;
+    }
+
+    try {
+        await signInAnonymously(auth);
+        const snap = await get(ref(db, 'tables/' + code));
+
+        // التحقق الصارم: لا أحد يدخل إلا بكلمة سر موجودة
+        if (!snap.exists()) {
+            document.getElementById('joinErr').textContent = '❌ كلمة السر غير صحيحة أو الطاولة غير مفعلة! يرجى الحصول على كلمة سر صالحة من الكافيه.';
+            document.getElementById('joinErr').classList.remove('hidden');
+            playBeep(180, 'sawtooth', 0.25);
+            return;
+        }
+
+        const data = snap.val() || {};
+
+        // فحص قفل الطاولة
+        if (data.locked) {
+            document.getElementById('joinErr').textContent = '❌ هذه الطاولة مقفلة مؤقتاً بأمر من إدارة المقهى.';
+            document.getElementById('joinErr').classList.remove('hidden');
+            playBeep(180, 'sawtooth', 0.25);
+            return;
+        }
+
+        // فحص نوع اللعبة
+        if (data.gameType && data.gameType !== 'all' && data.gameType !== 'board') {
+            document.getElementById('joinErr').textContent = `❌ هذه الطاولة مخصصة للعبة (${GAMES[data.gameType] || data.gameType}) وليست للعبة العبها صح!`;
+            document.getElementById('joinErr').classList.remove('hidden');
+            return;
+        }
+
+        // فحص كلمة السر المستهلكة (لمرة واحدة)
+        if (data.mode === 'single' && (data.state === 'finished' || (data.claimedBy && data.claimedBy !== auth.currentUser?.uid))) {
+            document.getElementById('joinErr').textContent = '❌ تم استخدام كلمة السر هذه لمرة واحدة بالفعل ومستهلكة! اطلب كلمة سر جديدة من كاشير المقهى.';
+            document.getElementById('joinErr').classList.remove('hidden');
+            playBeep(180, 'sawtooth', 0.25);
+            return;
+        }
+
+        // فحص وضع الصيانة العام
+        const setSnap = await get(ref(db, 'settings/platform'));
+        const plat = setSnap.exists() ? setSnap.val() : {};
+        if (plat.maintenance) {
+            document.getElementById('joinErr').textContent = '❌ ' + (plat.maintenanceMsg || 'المنصة في وضع الصيانة حالياً بأمر الإدارة.');
+            document.getElementById('joinErr').classList.remove('hidden');
+            return;
+        }
+
+        currentTable = code;
+        currentCafeId = data.cafeId || null;
+        currentTableNo = data.tableId || 1;
+
+        // حجز الطاولة رسمياً وتحديث أسمائها
+        await update(ref(db, 'tables/' + code), {
+            team1Name: team1,
+            team2Name: team2,
+            score1: 0,
+            score2: 0,
+            state: 'playing',
+            claimedBy: auth.currentUser?.uid || 'user',
+            startedAt: Date.now()
+        });
+
+        // جلب معلومات الكافيه
+        if (currentCafeId) {
+            get(ref(db, 'cafePublic/' + currentCafeId)).then(cs => {
+                if (cs.exists()) {
+                    document.getElementById('cafeHeaderInfo').textContent = `المقهى: ${cs.val().name || 'الكافيه'}`;
+                }
+            });
+        }
+        document.getElementById('tableHeaderBadge').textContent = `طاولة ${currentTableNo} ✓`;
+
+        await loadCategories();
+        playFanfare();
+
+        document.getElementById('stepJoin').classList.add('hidden');
+        document.getElementById('stepPicks').classList.remove('hidden');
+        renderPicks();
+    } catch(err) {
+        document.getElementById('joinErr').textContent = err.message || 'تعذر التحقق من الطاولة';
+        document.getElementById('joinErr').classList.remove('hidden');
+    }
+};
+
+// رسم واجهة اختيار الفئات
+function renderPicks() {
+    picksNeeded = Math.min(3, Math.max(1, Math.floor(cats.length / 2)));
+    document.getElementById('pickReqNum').textContent = picksNeeded;
+    document.getElementById('p1Title').textContent = `${team1} (${team1Cats.length}/${picksNeeded})`;
+    document.getElementById('p2Title').textContent = `${team2} (${team2Cats.length}/${picksNeeded})`;
+
+    const banner = document.getElementById('turnPickBanner');
+    if (team1Cats.length < picksNeeded) {
+        banner.textContent = `🎯 دور ${team1} لاختيار الفئات الآن (${team1Cats.length}/${picksNeeded})`;
+        banner.className = 'p-3 rounded-xl text-center font-bold text-sm bg-teal-500/20 text-teal-300 border border-teal-500/40 animate-pulse';
+    } else if (team2Cats.length < picksNeeded) {
+        banner.textContent = `🎯 دور ${team2} لاختيار الفئات الآن (${team2Cats.length}/${picksNeeded})`;
+        banner.className = 'p-3 rounded-xl text-center font-bold text-sm bg-pink-500/20 text-pink-300 border border-pink-500/40 animate-pulse';
+    } else {
+        banner.textContent = `✓ اكتملت الفئات! اضغط الزر أدناه لبدء التحدي`;
+        banner.className = 'p-3 rounded-xl text-center font-bold text-sm bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
+    }
+
+    [1, 2].forEach(teamNum => {
+        const list = document.getElementById('pList' + teamNum);
+        const myPicks = teamNum === 1 ? team1Cats : team2Cats;
+        const otherPicks = teamNum === 1 ? team2Cats : team1Cats;
+        list.innerHTML = '';
+
+        cats.forEach((c, idx) => {
+            const isMine = myPicks.includes(idx);
+            const isOther = otherPicks.includes(idx);
+            const b = document.createElement('button');
+            b.className = `w-full pick-item flex justify-between items-center p-3 rounded-xl border text-sm font-bold ${isMine ? (teamNum === 1 ? 'border-teal-400 bg-teal-500/20 text-teal-200' : 'border-pink-400 bg-pink-500/20 text-pink-200') : (isOther ? 'opacity-30 cursor-not-allowed border-slate-700 bg-slate-900' : 'border-slate-700 bg-slate-800/80 hover:border-slate-500 text-white')}`;
+            b.disabled = isOther;
+            b.innerHTML = `<span>${c.name}</span><span class="text-xs bg-slate-900/60 px-2 py-0.5 rounded-full text-gray-400">${isOther ? 'اختارها المنافس' : c.questions.length + ' سؤال'}</span>`;
+            b.onclick = () => {
+                playBeep(isMine ? 350 : 550, 'sine', 0.1);
+                if (isMine) {
+                    if (teamNum === 1) team1Cats = team1Cats.filter(x => x !== idx);
+                    else team2Cats = team2Cats.filter(x => x !== idx);
+                } else {
+                    if (teamNum === 1 && team1Cats.length < picksNeeded) team1Cats.push(idx);
+                    else if (teamNum === 2 && team2Cats.length < picksNeeded) team2Cats.push(idx);
+                }
+                renderPicks();
+            };
+            list.appendChild(b);
+        });
+    });
+
+    document.getElementById('launchBoardBtn').disabled = !(team1Cats.length === picksNeeded && team2Cats.length === picksNeeded);
+}
+
+document.getElementById('launchBoardBtn').onclick = () => {
+    playBeep(700, 'triangle', 0.2);
+    document.getElementById('stepPicks').classList.add('hidden');
+    document.getElementById('stepBoard').classList.remove('hidden');
+    document.getElementById('boardT1Name').textContent = team1;
+    document.getElementById('boardT2Name').textContent = team2;
+    document.getElementById('hlT1Name').textContent = team1;
+    document.getElementById('hlT2Name').textContent = team2;
+    document.getElementById('colHeader1').textContent = `${team1} (يمين)`;
+    document.getElementById('colHeader2').textContent = `${team2} (يسار)`;
+    document.getElementById('activeTeamTurn').textContent = team1;
+    renderBoard();
+};
+
+function allBoardCats() {
+    return [...team1Cats, ...team2Cats];
+}
+
+// رسم لوحة الخانات التفاعلية
+function renderBoard() {
+    document.getElementById('score1').textContent = score1;
+    document.getElementById('score2').textContent = score2;
+    document.getElementById('activeTeamTurn').textContent = activeTurn === 1 ? team1 : team2;
+    document.getElementById('activeTeamTurn').className = activeTurn === 1 ? 'text-xs sm:text-sm font-black text-teal-300 px-3 py-1 rounded-full bg-teal-950/60 border border-teal-500/40 inline-block' : 'text-xs sm:text-sm font-black text-pink-300 px-3 py-1 rounded-full bg-pink-950/60 border border-pink-500/40 inline-block';
+
+    updatePowerUpButtons();
+
+    const container = document.getElementById('boardContainer');
+    container.innerHTML = '';
+
+    const VALUES = [200, 400, 600];
+    const diffMap = { 200: 'easy', 400: 'medium', 600: 'hard' };
+
+    allBoardCats().forEach(catIdx => {
+        const c = cats[catIdx];
+        if (!c) return;
+        const owner = team1Cats.includes(catIdx) ? 1 : 2;
+
+        const row = document.createElement('div');
+        row.className = 'glass p-3 rounded-2xl grid grid-cols-[1fr_minmax(96px,0.5fr)_1fr] gap-2.5 sm:gap-4 items-center';
+
+        const createSide = (teamNum) => {
+            const wrap = document.createElement('div');
+            wrap.className = 'grid grid-cols-3 gap-1.5 sm:gap-2.5';
+            VALUES.forEach(val => {
+                const key = `${teamNum}:${catIdx}:${val}`;
+                const isUsed = usedCells.has(key);
+                const hasQ = c.questions.some(q => (q.difficulty || 'medium') === diffMap[val] && !usedQuestions.has(q.key));
+
+                const b = document.createElement('button');
+                b.className = `cell t${teamNum} ${isUsed ? 'used' : (hasQ ? '' : 'empty')}`;
+                b.innerHTML = isUsed ? '<span class="text-emerald-400 text-lg">✓</span>' : `<span>${val}</span>`;
+                if (!isUsed && hasQ) {
+                    b.onclick = () => openQuestion(teamNum, catIdx, val, c);
+                }
+                wrap.appendChild(b);
+            });
+            return wrap;
+        };
+
+        const middle = document.createElement('div');
+        middle.className = 'text-center px-1';
+        middle.innerHTML = `<span class="text-xs sm:text-sm font-extrabold text-white block truncate leading-tight">${c.name}</span><span class="text-[10px] font-bold ${owner === 1 ? 'text-teal-400' : 'text-pink-400'} block mt-0.5">فئة ${owner === 1 ? team1 : team2}</span>`;
+
+        row.appendChild(createSide(1));
+        row.appendChild(middle);
+        row.appendChild(createSide(2));
+        container.appendChild(row);
+    });
+
+    checkEndGame();
+}
+
+// تحديث أزرار وسائل المساعدة
+function updatePowerUpButtons() {
+    [1, 2].forEach(t => {
+        const p = powerUps[t];
+        const b50 = document.getElementById(`btn5050_${t}`);
+        const bT = document.getElementById(`btnTime_${t}`);
+        const bD = document.getElementById(`btnDbl_${t}`);
+        if (b50) b50.disabled = !p.fifty;
+        if (bT) bT.disabled = !p.time;
+        if (bD) bD.disabled = !p.dbl;
+        if (!p.fifty) b50?.classList.add('opacity-30', 'line-through');
+        if (!p.time) bT?.classList.add('opacity-30', 'line-through');
+        if (!p.dbl) bD?.classList.add('opacity-30', 'line-through');
+    });
+}
+
+// تفعيل وسائل المساعدة
+function useLifeline(type, teamNum) {
+    if (!currentCell) return alert('اختر سؤالاً من اللوحة أولاً لاستخدام وسيلة المساعدة!');
+    if (activeTurn !== teamNum) return alert(`هذه المساعدة خاصة بـ ${teamNum === 1 ? team1 : team2}!`);
+    const p = powerUps[teamNum];
+    if (!p[type]) return alert('تم استخدام هذه المساعدة مسبقاً!');
+
+    p[type] = false;
+    updatePowerUpButtons();
+    playBeep(900, 'sine', 0.2);
+
+    if (type === 'time') {
+        timeLeft += 15;
+        document.getElementById('modalTimer').textContent = `⏱ ${timeLeft} (+15ث)`;
+        document.getElementById('modalTimer').classList.add('text-emerald-400');
+    } else if (type === 'dbl') {
+        multiplier = 2;
+        document.getElementById('doubleBadge').classList.remove('hidden');
+    } else if (type === 'fifty') {
+        const hintBox = document.getElementById('lifelineHintBox');
+        hintBox.textContent = `💡 تلميح استبعاد: الإجابة تبدأ بالحرف (${(currentCell.q.a || '').charAt(0)}) أو تتعلق بمجال السؤال مباشرة!`;
+        hintBox.classList.remove('hidden');
+    }
+}
+
+document.getElementById('btn5050_1').onclick = () => useLifeline('fifty', 1);
+document.getElementById('btnTime_1').onclick = () => useLifeline('time', 1);
+document.getElementById('btnDbl_1').onclick = () => useLifeline('dbl', 1);
+
+document.getElementById('btn5050_2').onclick = () => useLifeline('fifty', 2);
+document.getElementById('btnTime_2').onclick = () => useLifeline('time', 2);
+document.getElementById('btnDbl_2').onclick = () => useLifeline('dbl', 2);
+
+// فتح السؤال
+function openQuestion(teamNum, catIdx, val, cat) {
+    playBeep(480, 'sine', 0.15);
+    multiplier = 1;
+    document.getElementById('doubleBadge').classList.add('hidden');
+    document.getElementById('lifelineHintBox').classList.add('hidden');
+
+    const diffMap = { 200: 'easy', 400: 'medium', 600: 'hard' };
+    const candidates = cat.questions.filter(q => (q.difficulty || 'medium') === diffMap[val] && !usedQuestions.has(q.key));
+    if (!candidates.length) return;
+
+    const q = candidates[Math.floor(Math.random() * candidates.length)];
+    usedQuestions.add(q.key);
+    usedCells.add(`${teamNum}:${catIdx}:${val}`);
+    currentCell = { teamNum, catIdx, val, q };
+
+    document.getElementById('modalCategory').textContent = `فئة: ${cat.name}`;
+    document.getElementById('modalPoints').textContent = `${val} نقطة`;
+    document.getElementById('modalQuestionText').textContent = q.q;
+    document.getElementById('modalAnswerText').textContent = q.a;
+    if (q.explanation) {
+        document.getElementById('modalExplanation').textContent = `💡 معلومة: ${q.explanation}`;
+        document.getElementById('modalExplanation').classList.remove('hidden');
+    } else {
+        document.getElementById('modalExplanation').classList.add('hidden');
+    }
+
+    // الوسائط
+    const mediaBox = document.getElementById('mediaBox');
+    mediaBox.innerHTML = '';
+    if (q.mediaUrl && q.mediaUrl.startsWith('http')) {
+        const yt = q.mediaUrl.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+        if (yt) {
+            mediaBox.innerHTML = `<iframe class="w-full aspect-video rounded-xl" src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`;
+        } else if (q.mediaUrl.match(/\.(mp4|webm|mov)(\?|$)/i)) {
+            mediaBox.innerHTML = `<video controls class="max-h-56 rounded-xl"><source src="${q.mediaUrl}"></video>`;
+        } else {
+            mediaBox.innerHTML = `<img src="${q.mediaUrl}" class="max-h-56 rounded-xl object-contain shadow-lg" alt="">`;
+        }
+        mediaBox.classList.remove('hidden');
+    } else {
+        mediaBox.classList.add('hidden');
+    }
+
+    document.getElementById('answerRevealBox').classList.add('hidden');
+    document.getElementById('revealBtn').classList.remove('hidden');
+    document.getElementById('awardButtons').classList.add('hidden');
+    document.getElementById('stealBox').classList.add('hidden');
+
+    document.getElementById('awardT1Btn').textContent = `✅ نقطة لـ (${team1})`;
+    document.getElementById('awardT2Btn').textContent = `✅ نقطة لـ (${team2})`;
+
+    // إعداد زر الخطف
+    const otherTeamNum = activeTurn === 1 ? 2 : 1;
+    const otherTeamName = activeTurn === 1 ? team2 : team1;
+    document.getElementById('stealTeamName').textContent = otherTeamName;
+
+    document.getElementById('qModal').classList.add('show');
+
+    // المؤقت
+    timeLeft = q.timeLimit || 30;
+    document.getElementById('modalTimer').textContent = `⏱ ${timeLeft}`;
+    document.getElementById('modalTimer').classList.remove('text-emerald-400');
+    clearInterval(timer);
+    timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById('modalTimer').textContent = `⏱ ${timeLeft}`;
+        if (timeLeft <= 5 && timeLeft > 0) playBeep(880, 'square', 0.08, 0.05);
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            playBeep(220, 'sawtooth', 0.3, 0.15);
+            // إتاحة فرصة الخطف للمنافس
+            document.getElementById('stealBox').classList.remove('hidden');
+            revealAnswer();
+        }
+    }, 1000);
+}
+
+function revealAnswer() {
+    clearInterval(timer);
+    playBeep(650, 'sine', 0.15);
+    document.getElementById('answerRevealBox').classList.remove('hidden');
+    document.getElementById('revealBtn').classList.add('hidden');
+    document.getElementById('awardButtons').classList.remove('hidden');
+    document.getElementById('stealBox').classList.remove('hidden');
+}
+document.getElementById('revealBtn').onclick = revealAnswer;
+
+// خطف السؤال
+document.getElementById('stealBtn').onclick = () => {
+    const otherTeamNum = activeTurn === 1 ? 2 : 1;
+    const halfVal = Math.round(((currentCell?.val || 0) * multiplier) / 2);
+    if (otherTeamNum === 1) score1 += halfVal;
+    else score2 += halfVal;
+    playFanfare();
+    finishQuestionAction();
+};
+
+document.getElementById('awardT1Btn').onclick = () => awardScore(1);
+document.getElementById('awardT2Btn').onclick = () => awardScore(2);
+document.getElementById('awardNoneBtn').onclick = () => awardScore(0);
+
+function awardScore(awardedTeam) {
+    const val = (currentCell?.val || 0) * multiplier;
+    if (awardedTeam === 1) {
+        score1 += val;
+        playFanfare();
+    } else if (awardedTeam === 2) {
+        score2 += val;
+        playFanfare();
+    } else {
+        playBeep(200, 'sine', 0.2);
+    }
+    finishQuestionAction();
+}
+
+function finishQuestionAction() {
+    clearInterval(timer);
+    activeTurn = activeTurn === 1 ? 2 : 1;
+    document.getElementById('qModal').classList.remove('show');
+    currentCell = null;
+    multiplier = 1;
+
+    if (currentTable) {
+        update(ref(db, 'tables/' + currentTable), { score1, score2, state: 'playing' });
+    }
+
+    renderBoard();
+}
+
+function anyPlayableRemaining() {
+    const VALUES = [200, 400, 600];
+    const diffMap = { 200: 'easy', 400: 'medium', 600: 'hard' };
+    for (const teamNum of [1, 2]) {
+        for (const catIdx of allBoardCats()) {
+            const c = cats[catIdx];
+            if (!c) continue;
+            for (const val of VALUES) {
+                if (!usedCells.has(`${teamNum}:${catIdx}:${val}`) && c.questions.some(q => (q.difficulty || 'medium') === diffMap[val] && !usedQuestions.has(q.key))) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+let gameEnded = false;
+function checkEndGame() {
+    if (anyPlayableRemaining() || usedCells.size === 0) return;
+    if (gameEnded) return;
+    gameEnded = true;
+
+    playWinSound();
+    launchConfetti();
+
+    const titleEl = document.getElementById('victoryTitle');
+    const subEl = document.getElementById('victorySubtitle');
+    let winnerName = '';
+
+    if (score1 === score2) {
+        titleEl.textContent = '🤝 تعادل بطولي رائع!';
+        subEl.textContent = `تعادل الفريقان بالنتيجة النهائية: ${score1} نقطة لكل منهما.`;
+    } else {
+        winnerName = score1 > score2 ? team1 : team2;
+        const diff = Math.abs(score1 - score2);
+        titleEl.textContent = `🏆 الفائز: ${winnerName}!`;
+        subEl.textContent = `حقق الفوز بنتيجة ${Math.max(score1, score2)} مقابل ${Math.min(score1, score2)} (بفارق ${diff} نقطة).`;
+    }
+
+    if (currentTable) {
+        update(ref(db, 'tables/' + currentTable), { score1, score2, state: 'finished' });
+        push(ref(db, 'gameLog'), {
+            cafeId: currentCafeId, tableId: currentTableNo, game: 'العبها صح', team1Name: team1, team2Name: team2, score1, score2, ts: Date.now()
+        });
+
+        // تسجيل في لوحة المتصدرين وتوليد كود الجائزة
+        (async () => {
+            const isT1Win = score1 > score2;
+            const isT2Win = score2 > score1;
+            const res1 = await recordResult({ cafeId: currentCafeId, game: 'العبها صح', name: team1, score: score1, win: isT1Win });
+            const res2 = await recordResult({ cafeId: currentCafeId, game: 'العبها صح', name: team2, score: score2, win: isT2Win });
+            const prizeObj = res1 || res2;
+            if (prizeObj) {
+                document.getElementById('prizeVoucher').innerHTML = prizeHtml(prizeObj, currentCafeId);
+            }
+        })();
+    }
+
+    document.getElementById('victoryCard').classList.remove('hidden');
+    document.getElementById('victoryCard').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+window.playAgain = () => {
+    usedCells.clear();
+    score1 = 0;
+    score2 = 0;
+    gameEnded = false;
+    powerUps[1] = { fifty: true, time: true, dbl: true };
+    powerUps[2] = { fifty: true, time: true, dbl: true };
+    document.getElementById('victoryCard').classList.add('hidden');
+    renderBoard();
+};
+
+function launchConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const pieces = Array.from({ length: 90 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        size: Math.random() * 8 + 4,
+        color: ['#ffc53d', '#25e0c0', '#ff4d6d', '#20c997', '#fff'][Math.floor(Math.random() * 5)],
+        speedY: Math.random() * 3 + 2,
+        speedX: Math.random() * 2 - 1,
+        angle: Math.random() * 360
+    }));
+
+    let frames = 0;
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+            p.y += p.speedY;
+            p.x += p.speedX;
+            p.angle += 3;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(p.x, p.y, p.size, p.size);
+        });
+        if (frames++ < 160) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    draw();
+}
+</script>
+</body>
+</html>

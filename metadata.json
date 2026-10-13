@@ -1,0 +1,8 @@
+{
+  "name": "العبها صح - منصة ألعاب المقاهي",
+  "description": "منصة ترفيهية شاملة لإدارة ألعاب المقاهي، لعبة المافيا متعددة اللاعبين، وتحدي الطاولات التفاعلية",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

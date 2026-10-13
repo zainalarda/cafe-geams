@@ -1,0 +1,113 @@
+# إعدادات نشر واستضافة منصة «العبها صح» على Netlify
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+# ==============================================================================
+# 1. توجيه الروابط المباشرة (Clean URLs & Direct Navigation)
+# ==============================================================================
+# توجيه لوحة الإدارة
+[[redirects]]
+  from = "/admin"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin.html"
+  to = "/index.html"
+  status = 200
+
+# توجيه بوابة الألعاب للزبائن
+[[redirects]]
+  from = "/games"
+  to = "/games.html"
+  status = 200
+
+[[redirects]]
+  from = "/play"
+  to = "/games.html"
+  status = 200
+
+# توجيه شاشة طاولة اللعب التفاعلية
+[[redirects]]
+  from = "/player"
+  to = "/player.html"
+  status = 200
+
+[[redirects]]
+  from = "/board"
+  to = "/player.html"
+  status = 200
+
+# توجيه لعبة المافيا
+[[redirects]]
+  from = "/mafia"
+  to = "/mafia.html"
+  status = 200
+
+# توجيه لعبة سباق الأسئلة
+[[redirects]]
+  from = "/race"
+  to = "/race.html"
+  status = 200
+
+# توجيه لعبة إنسان حيوان نبات
+[[redirects]]
+  from = "/htns"
+  to = "/htns.html"
+  status = 200
+
+# توجيه لوحة الشرف والمتصدرين
+[[redirects]]
+  from = "/leaderboard"
+  to = "/leaderboard.html"
+  status = 200
+
+# مسارات تنزيل أرشيف المشروع
+[[redirects]]
+  from = "/download"
+  to = "/cafe-games-project.zip"
+  status = 200
+
+[[redirects]]
+  from = "/download-project"
+  to = "/cafe-games-project.zip"
+  status = 200
+
+[[redirects]]
+  from = "/api/download"
+  to = "/cafe-games-project.zip"
+  status = 200
+
+# ==============================================================================
+# 2. توجيه دوال الخادم السحابية (Netlify Serverless Functions API)
+# ==============================================================================
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# ==============================================================================
+# 3. ترويسات الأمان وضبط CORS والتخزين المؤقت (Security & Headers)
+# ==============================================================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    X-Content-Type-Options = "nosniff"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+
+[[headers]]
+  for = "/*.zip"
+  [headers.values]
+    Content-Type = "application/zip"
+    Content-Disposition = "attachment; filename=\"cafe-games-full-project.zip\""

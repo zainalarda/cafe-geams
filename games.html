@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>بوابة ألعاب الكافيه - اختر لعبتك وابدأ التحدي</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{font-family:'Cairo',sans-serif;background-color:#070a14;color:#f3f5fc;margin:0;min-height:100vh;
+  background-image:radial-gradient(900px 500px at 85% -10%,rgba(255,197,61,.09) 0,transparent 55%),
+    radial-gradient(850px 480px at -5% 105%,rgba(255,77,109,.09) 0,transparent 50%),
+    linear-gradient(180deg,#0f1629 0%,#070a14 100%);
+  background-attachment:fixed;
+}
+.glass{background:rgba(21,29,51,0.85);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.09)}
+.game-card{transition:all .22s cubic-bezier(0.16,1,0.3,1)}
+.game-card:hover{transform:translateY(-6px);border-color:rgba(255,197,61,0.45);box-shadow:0 16px 32px -8px rgba(0,0,0,0.5)}
+.hidden{display:none !important}
+</style>
+</head>
+<body class="p-4 sm:p-6 flex flex-col items-center">
+    <div class="w-full max-w-5xl space-y-6">
+        <!-- الشريط العلوي -->
+        <header class="glass p-4 rounded-2xl flex flex-wrap justify-between items-center gap-3 shadow-xl">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg">
+                    ☕
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black text-white flex items-center gap-2">
+                        بوابة ألعاب المقاهي <span class="text-xs bg-slate-800 text-cyan-300 px-2.5 py-0.5 rounded-full font-bold border border-slate-700" id="cafeNameBadge">العبها صح</span>
+                    </h1>
+                    <p class="text-xs text-gray-400 font-medium" id="headerSubtitle">اختر لعبتك وتنافس مع أصدقائك على الطاولة</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <div id="activeTableChip" class="hidden glass px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="chipText">طاولة 1</span>
+                    <button id="changeCodeBtn" class="text-gray-400 hover:text-white mr-1 text-[11px]" title="تغيير كلمة السر">تغيير</button>
+                </div>
+                <button id="soundToggle" class="glass px-3 py-1.5 rounded-xl text-xs font-bold text-gray-300 hover:text-white transition flex items-center gap-1.5">
+                    <span id="sndIcon">🔊</span> <span class="hidden sm:inline">الصوت</span>
+                </button>
+                <a href="/index.html" class="bg-slate-800 hover:bg-slate-700 text-gray-300 px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 border border-slate-700">
+                    <i class="fas fa-cog"></i> <span class="hidden sm:inline">لوحة التحكم</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- تنبيه البث المباشر من المقهى إن وجد -->
+        <div id="liveAnnouncementBox" class="hidden bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border-2 border-amber-500/50 rounded-2xl p-4 text-center space-y-1 animate-pulse">
+            <span class="text-xs font-black text-amber-300 block"><i class="fas fa-bullhorn ml-1"></i> إشعار مباشر من إدارة المقهى:</span>
+            <p id="liveAnnouncementText" class="text-sm font-bold text-white"></p>
+        </div>
+
+        <!-- بطاقة التحقق من كلمة سر الطاولة (إلزامية لدخول أي لعبة) -->
+        <div id="passcodePromptCard" class="glass p-6 sm:p-8 rounded-3xl border-2 border-amber-500/40 text-center space-y-4 shadow-2xl">
+            <div class="inline-block bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs px-3.5 py-1.5 rounded-full font-bold">
+                🔒 الدخول محمي: لا يمكن بدء أي لعبة إلا بكلمة سر معتمدة من الكافيه
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-white">أدخل كلمة سر الطاولة لبدء اللعب</h2>
+            <p class="text-xs sm:text-sm text-gray-400 max-w-md mx-auto">
+                اكتب الرمز السري المطبوع على بطاقة طاولتك أو اطلبه من الكاشير لفتح جميع الألعاب المتاحة.
+            </p>
+
+            <div class="max-w-sm mx-auto space-y-3">
+                <input id="tableCodeInput" type="text" dir="ltr" maxlength="12" placeholder="اكتب كلمة السر هنا" class="w-full bg-slate-900 border-2 border-slate-600 focus:border-amber-400 rounded-2xl px-5 py-3.5 text-white font-mono uppercase tracking-widest text-center focus:outline-none font-black text-xl shadow-inner">
+                <div id="codeErr" class="text-xs text-red-300 hidden bg-red-950/70 p-2.5 rounded-xl border border-red-800 font-bold"></div>
+                <button id="verifyBtn" class="w-full bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black py-3.5 rounded-2xl shadow-xl transition transform active:scale-95 text-base flex items-center justify-center gap-2">
+                    <i class="fas fa-key"></i> التحقق وتفعيل الألعاب 🎯
+                </button>
+            </div>
+        </div>
+
+        <!-- بطاقة الطاولة المفعلة والجاهزة -->
+        <div id="verifiedNotice" class="hidden glass p-4 rounded-2xl border border-emerald-500/40 bg-emerald-950/20 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xl">
+                    ✓
+                </div>
+                <div>
+                    <h3 class="font-bold text-emerald-300 text-sm">تم تفعيل الطاولة بنجاح!</h3>
+                    <p id="tableDetailsText" class="text-xs text-gray-300">طاولة 1 • مقهى اللمة الحلوة • اختر أي لعبة أدناه للانطلاق مباشرة</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="tableModeBadge" class="text-xs bg-slate-800 text-cyan-300 px-2.5 py-1 rounded-lg font-bold">متعدد الاستخدام</span>
+            </div>
+        </div>
+
+        <!-- شبكة اختيار الألعاب -->
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-black text-white flex items-center gap-2">
+                    <i class="fas fa-gamepad text-amber-400"></i> الألعاب المتاحة على الطاولة
+                </h2>
+                <span class="text-xs text-gray-400">اضغط على أي لعبة للانضمام</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                <!-- 1. العبها صح -->
+                <div class="game-card glass p-6 rounded-3xl border border-slate-700/80 flex flex-col justify-between space-y-4 cursor-pointer relative overflow-hidden group" data-game="board">
+                    <div class="flex justify-between items-start">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-teal-400 to-emerald-500 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg">
+                            🎯
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">فريقين (2 Teams)</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-white group-hover:text-amber-300 transition">العبها صح - تحدي الفرق</h3>
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                            تحدي الذكاء والمعلومات التنافسي على شبكة خانات 200 و 400 و 600 مع وسائل مساعدة تفاعلية (50:50، وقت إضافي، نقاط مضاعفة، وخطف السؤال).
+                        </p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700/60 flex justify-between items-center text-xs">
+                        <span class="text-gray-400"><i class="fas fa-users ml-1"></i> تنافس جماعي</span>
+                        <button class="bg-teal-600 group-hover:bg-teal-500 text-white px-4 py-2 rounded-xl font-bold transition flex items-center gap-1.5">
+                            <span>دخول اللعبة</span> <i class="fas fa-arrow-left text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. لعبة المافيا -->
+                <div class="game-card glass p-6 rounded-3xl border border-slate-700/80 flex flex-col justify-between space-y-4 cursor-pointer relative overflow-hidden group" data-game="mafia">
+                    <div class="flex justify-between items-start">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-red-500 to-rose-600 text-white flex items-center justify-center font-black text-2xl shadow-lg">
+                            🎭
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-red-500/20 text-red-300 border border-red-500/30">5 إلى 20 لاعب</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-white group-hover:text-amber-300 transition">لعبة المافيا (MAFIA)</h3>
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                            لعبة الخداع والتحقيق الشهيرة! أطوار ليلية سرية، تصويت نهاري، دردشة مافيا مشفرة، وأدوار خاصة (طبيب، محقق، مهرّج، قناص).
+                        </p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700/60 flex justify-between items-center text-xs">
+                        <span class="text-gray-400"><i class="fas fa-moon ml-1"></i> غموض وتحقيق</span>
+                        <button class="bg-red-600 group-hover:bg-red-500 text-white px-4 py-2 rounded-xl font-bold transition flex items-center gap-1.5">
+                            <span>دخول اللعبة</span> <i class="fas fa-arrow-left text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 3. إنسان حيوان نبات -->
+                <div class="game-card glass p-6 rounded-3xl border border-slate-700/80 flex flex-col justify-between space-y-4 cursor-pointer relative overflow-hidden group" data-game="htns">
+                    <div class="flex justify-between items-start">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-400 to-green-500 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg">
+                            🌿
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">سرعة بديهة</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-white group-hover:text-amber-300 transition">إنسان • حيوان • نبات</h3>
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                            عجلة سحب الحروف العشوائية، مؤقت 60 ثانية، مع زر (أتوبيس كومبليت!) لاحتساب النقاط الفورية وتوثيق النتائج.
+                        </p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700/60 flex justify-between items-center text-xs">
+                        <span class="text-gray-400"><i class="fas fa-bolt ml-1"></i> كلمات وسرعة</span>
+                        <button class="bg-emerald-600 group-hover:bg-emerald-500 text-white px-4 py-2 rounded-xl font-bold transition flex items-center gap-1.5">
+                            <span>دخول اللعبة</span> <i class="fas fa-arrow-left text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4. سباق الأسئلة السريع -->
+                <div class="game-card glass p-6 rounded-3xl border border-slate-700/80 flex flex-col justify-between space-y-4 cursor-pointer relative overflow-hidden group" data-game="race">
+                    <div class="flex justify-between items-start">
+                        <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 text-slate-950 flex items-center justify-center font-black text-2xl shadow-lg">
+                            ⚡
+                        </div>
+                        <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">نظام الطنان (Buzzer)</span>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-black text-white group-hover:text-amber-300 transition">سباق الأسئلة (Speed Trivia)</h3>
+                        <p class="text-xs text-gray-400 mt-1 leading-relaxed">
+                            8 أسئلة سريعة مع مؤقت خاطف (12 ثانية لكل سؤال) ومضاعفة نقاط كلما أجبت بسرعة أكبر لتتصدر لوحة الشرف!
+                        </p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-700/60 flex justify-between items-center text-xs">
+                        <span class="text-gray-400"><i class="fas fa-trophy ml-1"></i> نقاط وجوائز</span>
+                        <button class="bg-amber-600 group-hover:bg-amber-500 text-slate-950 px-4 py-2 rounded-xl font-black transition flex items-center gap-1.5">
+                            <span>دخول اللعبة</span> <i class="fas fa-arrow-left text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- بطاقة لوحة المتصدرين والجوائز -->
+            <div class="glass p-5 rounded-3xl border border-yellow-500/30 mt-4 flex flex-wrap justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-yellow-500/20 text-yellow-300 flex items-center justify-center text-2xl font-bold">
+                        🏆
+                    </div>
+                    <div>
+                        <h3 class="font-black text-white text-base">لوحة المتصدرين وجوائز الكافيه</h3>
+                        <p class="text-xs text-gray-400">شاهد الأبطال الفائزين واستعلم عن الجوائز المتاحة لهذا المقهى</p>
+                    </div>
+                </div>
+                <button id="viewLeaderboardBtn" class="bg-slate-800 hover:bg-slate-700 text-yellow-300 border border-yellow-500/30 px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-1.5">
+                    <i class="fas fa-medal"></i> عرض لوحة المتصدرين
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة طلب كلمة السر عند النقر على لعبة قبل التحقق -->
+    <div id="modalPasscode" class="hidden fixed inset-0 bg-black/85 z-50 flex items-center justify-center p-4">
+        <div class="glass w-full max-w-md rounded-3xl p-6 border-2 border-amber-500/40 shadow-2xl text-center space-y-4">
+            <div class="w-12 h-12 bg-amber-500/20 text-amber-400 rounded-2xl flex items-center justify-center mx-auto text-xl font-bold">
+                🔒
+            </div>
+            <h3 class="text-xl font-black text-white">كلمة سر الطاولة مطلوبة</h3>
+            <p class="text-xs text-gray-400" id="targetGamePrompt">يرجى كتابة كلمة السر للانضمام إلى اللعبة</p>
+
+            <input id="modalCodeInp" type="text" dir="ltr" maxlength="12" placeholder="اكتب كلمة السر هنا" class="w-full bg-slate-900 border-2 border-slate-600 focus:border-amber-400 rounded-2xl px-4 py-3 text-white font-mono uppercase text-center font-black tracking-widest text-lg focus:outline-none">
+            <div id="modalErr" class="text-xs text-red-300 hidden bg-red-950/70 p-2.5 rounded-xl border border-red-800 font-bold"></div>
+
+            <div class="flex gap-2 pt-2">
+                <button id="modalConfirmBtn" class="flex-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-black py-3 rounded-xl text-sm transition">
+                    تأكيد ودخول اللعبة 🚀
+                </button>
+                <button id="modalCloseBtn" class="px-5 bg-slate-800 hover:bg-slate-700 text-gray-300 font-bold py-3 rounded-xl text-sm transition">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, auth, ref, get, onValue, signInAnonymously } from './firebase-init.js';
+
+        let verifiedTable = null;
+        let verifiedCode = null;
+        let selectedGameTarget = null;
+        let soundEnabled = true;
+
+        // الصوتيات
+        let audioCtx = null;
+        function playBeep(freq = 440, type = 'sine', duration = 0.12) {
+            if (!soundEnabled) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.type = type; o.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                o.connect(g); g.connect(audioCtx.destination);
+                o.start(); o.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        document.getElementById('soundToggle').onclick = () => {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sndIcon').textContent = soundEnabled ? '🔊' : '🔇';
+        };
+
+        // فحص الرمز من الرابط أو الجلسة
+        const P = new URLSearchParams(location.search);
+        const urlCode = P.get('code') || sessionStorage.getItem('alabha_table_code');
+        if (urlCode) {
+            document.getElementById('tableCodeInput').value = urlCode;
+            verifyCode(urlCode, false);
+        }
+
+        // الاستماع للبث المباشر والإعلانات العامة
+        onValue(ref(db, 'settings/platform/announcement'), (s) => {
+            const txt = s.exists() ? s.val() : '';
+            const box = document.getElementById('liveAnnouncementBox');
+            if (txt && txt.trim()) {
+                document.getElementById('liveAnnouncementText').textContent = txt.trim();
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        });
+
+        // التحقق من كلمة السر
+        async function verifyCode(codeRaw, autoLaunchGame = null) {
+            const errEl = document.getElementById('codeErr');
+            const modalErr = document.getElementById('modalErr');
+            errEl.classList.add('hidden');
+            modalErr.classList.add('hidden');
+
+            const code = String(codeRaw || '').trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (!code) {
+                const msg = '❌ يرجى إدخال كلمة سر الطاولة أولاً.';
+                errEl.textContent = msg; errEl.classList.remove('hidden');
+                modalErr.textContent = msg; modalErr.classList.remove('hidden');
+                playBeep(200, 'sawtooth', 0.2);
+                return false;
+            }
+
+            try {
+                await signInAnonymously(auth);
+                const snap = await get(ref(db, 'tables/' + code));
+
+                // التحقق الصارم: لا أحد يدخل إلا بكلمة سر موجودة
+                if (!snap.exists()) {
+                    const msg = '❌ كلمة السر غير صحيحة أو الطاولة غير مفعلة! تأكد من الرمز المستلم من الكافيه.';
+                    errEl.textContent = msg; errEl.classList.remove('hidden');
+                    modalErr.textContent = msg; modalErr.classList.remove('hidden');
+                    playBeep(200, 'sawtooth', 0.25);
+                    return false;
+                }
+
+                const data = snap.val() || {};
+
+                // فحص قفل الطاولة من الكافيه
+                if (data.locked) {
+                    const msg = '❌ هذه الطاولة مقفلة مؤقتاً بأمر من إدارة المقهى.';
+                    errEl.textContent = msg; errEl.classList.remove('hidden');
+                    modalErr.textContent = msg; modalErr.classList.remove('hidden');
+                    playBeep(180, 'sawtooth', 0.25);
+                    return false;
+                }
+
+                // فحص نوع اللعبة إن كانت الطاولة مخصصة للعبة معينة
+                if (data.gameType && data.gameType !== 'all' && autoLaunchGame && data.gameType !== autoLaunchGame) {
+                    const gameNames = { board: 'العبها صح', mafia: 'لعبة المافيا', htns: 'إنسان حيوان نبات', race: 'سباق الأسئلة' };
+                    const msg = `❌ هذه الطاولة مخصصة للعبة (${gameNames[data.gameType] || data.gameType}) فقط!`;
+                    errEl.textContent = msg; errEl.classList.remove('hidden');
+                    modalErr.textContent = msg; modalErr.classList.remove('hidden');
+                    playBeep(180, 'sawtooth', 0.25);
+                    return false;
+                }
+
+                // فحص كلمة السر لمرة واحدة إن كانت مستهلكة
+                if (data.mode === 'single' && (data.state === 'finished' || (data.claimedBy && data.claimedBy !== auth.currentUser?.uid))) {
+                    const msg = '❌ تم استهلاك كلمة السر لمرة واحدة بالفعل! يرجى طلب كلمة سر جديدة من كاشير المقهى.';
+                    errEl.textContent = msg; errEl.classList.remove('hidden');
+                    modalErr.textContent = msg; modalErr.classList.remove('hidden');
+                    playBeep(180, 'sawtooth', 0.25);
+                    return false;
+                }
+
+                // فحص وضع الصيانة العام
+                const setSnap = await get(ref(db, 'settings/platform'));
+                const plat = setSnap.exists() ? setSnap.val() : {};
+                if (plat.maintenance) {
+                    const msg = '❌ ' + (plat.maintenanceMsg || 'المنصة في وضع الصيانة حالياً بأمر الإدارة.');
+                    errEl.textContent = msg; errEl.classList.remove('hidden');
+                    modalErr.textContent = msg; modalErr.classList.remove('hidden');
+                    return false;
+                }
+
+                // نجاح التحقق
+                verifiedTable = data;
+                verifiedCode = code;
+                sessionStorage.setItem('alabha_table_code', code);
+                playBeep(660, 'sine', 0.2);
+
+                // جلب اسم الكافيه
+                let cafeName = 'الكافيه';
+                if (data.cafeId) {
+                    const cs = await get(ref(db, 'cafePublic/' + data.cafeId));
+                    if (cs.exists()) cafeName = cs.val().name || cafeName;
+                }
+
+                document.getElementById('cafeNameBadge').textContent = cafeName;
+                document.getElementById('chipText').textContent = `طاولة ${data.tableId || 1} (${code})`;
+                document.getElementById('activeTableChip').classList.remove('hidden');
+
+                document.getElementById('tableDetailsText').textContent = `طاولة رقم ${data.tableId || 1} • ${cafeName} • الكود: ${code}`;
+                document.getElementById('tableModeBadge').textContent = data.mode === 'single' ? 'مرة واحدة' : 'متعدد الاستخدام';
+                document.getElementById('verifiedNotice').classList.remove('hidden');
+                document.getElementById('passcodePromptCard').classList.add('hidden');
+                document.getElementById('modalPasscode').classList.add('hidden');
+
+                if (autoLaunchGame) {
+                    launchGame(autoLaunchGame);
+                }
+
+                return true;
+            } catch(e) {
+                errEl.textContent = e.message || 'تعذر التحقق من كلمة السر';
+                errEl.classList.remove('hidden');
+                return false;
+            }
+        }
+
+        document.getElementById('verifyBtn').onclick = () => {
+            const val = document.getElementById('tableCodeInput').value;
+            verifyCode(val);
+        };
+        document.getElementById('tableCodeInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyCode(document.getElementById('tableCodeInput').value);
+            }
+        });
+
+        document.getElementById('changeCodeBtn').onclick = () => {
+            sessionStorage.removeItem('alabha_table_code');
+            verifiedTable = null;
+            verifiedCode = null;
+            document.getElementById('activeTableChip').classList.add('hidden');
+            document.getElementById('verifiedNotice').classList.add('hidden');
+            document.getElementById('passcodePromptCard').classList.remove('hidden');
+            document.getElementById('tableCodeInput').value = '';
+            document.getElementById('tableCodeInput').focus();
+        };
+
+        // النقر على بطاقات الألعاب
+        document.querySelectorAll('[data-game]').forEach(card => {
+            card.onclick = () => {
+                const g = card.dataset.game;
+                playBeep(520, 'sine', 0.1);
+                if (verifiedCode) {
+                    launchGame(g);
+                } else {
+                    // فتح نافذة طلب كلمة السر
+                    selectedGameTarget = g;
+                    const gameNames = { board: 'العبها صح', mafia: 'لعبة المافيا', htns: 'إنسان حيوان نبات', race: 'سباق الأسئلة' };
+                    document.getElementById('targetGamePrompt').textContent = `أدخل كلمة سر الطاولة لدخول (${gameNames[g] || 'اللعبة'}) 🔒`;
+                    document.getElementById('modalCodeInp').value = document.getElementById('tableCodeInput').value || '';
+                    document.getElementById('modalPasscode').classList.remove('hidden');
+                    document.getElementById('modalCodeInp').focus();
+                }
+            };
+        });
+
+        document.getElementById('modalConfirmBtn').onclick = async () => {
+            const c = document.getElementById('modalCodeInp').value;
+            await verifyCode(c, selectedGameTarget);
+        };
+        document.getElementById('modalCodeInp').addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                await verifyCode(document.getElementById('modalCodeInp').value, selectedGameTarget);
+            }
+        });
+
+        document.getElementById('modalCloseBtn').onclick = () => {
+            document.getElementById('modalPasscode').classList.add('hidden');
+        };
+
+        function launchGame(gameKey) {
+            const c = verifiedCode ? `?code=${encodeURIComponent(verifiedCode)}` : '';
+            if (gameKey === 'board') location.href = '/player.html' + c;
+            else if (gameKey === 'mafia') location.href = '/mafia.html' + c;
+            else if (gameKey === 'htns') location.href = '/htns.html' + c;
+            else if (gameKey === 'race') location.href = '/race.html' + c;
+        }
+
+        document.getElementById('viewLeaderboardBtn').onclick = () => {
+            const cafeParam = verifiedTable?.cafeId ? `?cafe=${encodeURIComponent(verifiedTable.cafeId)}` : '';
+            location.href = '/leaderboard.html' + cafeParam;
+        };
+    </script>
+</body>
+</html>
